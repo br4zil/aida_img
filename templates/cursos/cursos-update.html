@@ -1,0 +1,36 @@
+{% extends 'galeria/base.html' %}
+
+{% load static %}
+{% block content %}
+
+
+                <div class="card">
+                    <div class="card-header">
+                      <h5>Alterar Curso</h5>
+                    </div>
+                    <div class="card-body form-group">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="row">
+                                {% for field in form %}
+                                <div class="col-12 col-lg-12 ">
+                                    {% if not field.is_hidden %}
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {% endif %}
+                                    {{ field }}
+                                </div>
+                                
+                                {% endfor %}
+                            </div>
+                            <div class="row form-group my-3">
+                                <div class="col-12 col-lg-12 text-center">
+                                <button class="btn btn-success col-3" type="submit">Salvar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                  </div>
+
+{% endblock %}
+
+{% include 'galeria/_footer.html' %}

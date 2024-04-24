@@ -1,0 +1,38 @@
+{% extends 'galeria/base.html' %}
+
+{% load static %}
+{% block content %}
+
+    
+    <h5>Cursos</h5>
+    <a type="button" class="btn btn-success" href="{%url 'cursos-create' %}">Novo</a>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Nome</th>
+          <th scope="col">Data</th>
+          <th scope="col">Instituição</th>
+          <th scope="col" class="col-md-3">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for curso in cursos %}
+        <tr>          
+          <th scope="row">{{ curso.id }}</th>
+          <td>{{ curso.nome }}</td>
+          <td>{{ curso.data }}</td>
+          <td>{{ curso.instituicao }}</td>
+          <td>
+            <a type="button" class="btn btn-warning" href="/cursos-update/{{ curso.id }}">Editar</a>
+            <a type="button" class="btn btn-danger" href="/cursos-delete/{{ curso.id }}">Excluir</a>
+            <a type="button" class="btn btn-info" href="/galeria-list/{{ curso.id }}">Imagens</a>
+        </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+
+{% endblock %}
