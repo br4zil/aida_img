@@ -3,9 +3,6 @@
 {% load static %}
 {% block content %}
               <h5>Imagens do Curso: {{ curso.0.nome }}  </h5>
-              <p>&nbsp;</p>
-              <a type="button" class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens</a>
-              <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a>
               {% if not imagens_curso %}
                   <p>Não há imagens para este curso.</p>
               {% else %}
@@ -38,4 +35,61 @@
                 </div>
                 {% endif %}                  
                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <section class="conteudo">
+                <section class="galeria">
+                    <div class="cards">
+                        <h2 class="cards__titulo"></h2>
+                        <ul class="cards__lista">
+                            {% if cards %}
+                            {% for fotografia in cards %}
+                            <li class="card">
+                                <a href="{% url 'imagem' fotografia.0.id %}">
+                                    {% if fotografia.foto == "" or fotografia.0.foto == null %}
+                                        <img class="card__imagem" src="{% static '/assets/imagens/galeria/not-found.png'%}" alt="foto">
+                                    {% else %}
+                                        <img class="card__imagem" src="{{fotografia.0.foto.url}}" alt="foto">                                    
+                                    {% endif %}
+                                </a>
+                                {% if fotografia.1 == True %}
+                                <p>Cor Única</p>
+                                {% else %}
+                                <p>Várias Cores</p>
+                                {% endif %}
+                                <span class="card__tag">Estrelas</span>
+                                <div class="card__info">
+                                    <p class="card__titulo">{{ fotografia.nome }}</p>
+                                    <div class="card__texto">
+                                        <p class="card__descricao">{{ fotografia.legenda }}</p>
+                                        <span>
+                                            <img src="{% static '/assets/ícones/1x/favorite_outline.png' %}" alt="ícone de coração">
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                            {% else %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+</div>
+
 {% endblock %}

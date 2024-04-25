@@ -7,8 +7,6 @@ from cursos.models import Cursos
 from django.templatetags.static import static
 from django.contrib import messages
 from usuarios.views import validaAutenticacao
-from galeria.forms import ImagensCursoForm
-
 
 from galeria import unica_cor
 from galeria import teste_google_image
@@ -26,8 +24,6 @@ def galeriaList(request, id_curso):
         return redirect('login') 
     imagens_curso = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso)
     curso = Cursos.objects.filter(id=id_curso)
-    request.session['id_curso']=curso[0].id
-    request.session['nome_curso']=curso[0].nome
     return render(request, 'galeria/index.html', {"imagens_curso":imagens_curso, "curso": curso})
 
 
@@ -80,29 +76,3 @@ def galeria(request):
     return render(request, 'galeria/index.html', {"cards":fotografias_class});
 
 
-def galeriaUpload(request):
-    # Verifica se o método da requisição é POST
-    if request.method == "POST":
-        form = ImagensCursoForm(request.POST, request.FILES)
-        c=Cursos.objects.filter(id=request.session.get('id_curso'))
-        # Se o formulário for válido, processa as imagens
-        if form.is_valid():
-            # Obtenha a lista de imagens enviadas
-            images = request.FILES.getlist('imagem')
-            
-            # Processa cada imagem
-            for image in images:
-                # Crie uma instância de ImagensCurso para cada imagem
-                imagem_curso = ImagensCurso(
-                    imagem=image,
-                    curso=c[0],
-                )
-                # Salva a instância
-                imagem_curso.save()
-                
-            # Redireciona após salvar todas as imagens
-            return redirect('galeria-list/'+str(c[0].id))
-    else:
-        form = ImagensCursoForm()
-    
-    return render(request, 'galeria/upload_imagens.html', {'form': form})

@@ -1,6 +1,6 @@
-from django.contrib import admin
-from galeria.models import ImagensCurso
-from cursos.models import Cursos
+# from django.contrib import admin
+# from galeria.models import Fotografia
+# from cursos.models import Cursos
 
 # class ListandoFotografias(admin.ModelAdmin):
 #     list_display = ("id", "nome", "legenda", "plublicada", "foto")
@@ -15,5 +15,5 @@ from cursos.models import Cursos
 #     search_fields = ("nome",)
 #     list_per_page = 10
 
-admin.site.register(ImagensCurso)
-admin.site.register(Cursos)
+# admin.site.register(Fotografia, ListandoFotografias)
+# admin.site.register(Cursos, ListandoCursos)
