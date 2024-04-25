@@ -1,0 +1,1 @@
+web: gunicorn AIDA_IMG.wsgi --log-file -
