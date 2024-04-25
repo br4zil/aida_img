@@ -1,0 +1,43 @@
+{% extends 'galeria/base.html' %}
+
+{% load static %}
+{% block content %}
+
+
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <!-- Campo para selecionar várias imagens -->
+    <br>
+    
+    
+</form>
+
+
+
+<div class="card">
+    <div class="card-header">
+        <h5>Imagens do Curso: {{ request.session.nome_curso }}  </h5>
+    </div>
+    <div class="card-body form-group">
+        <p>&nbsp;</p>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <label for="id_imagem">Imagens:</label>
+                <input type="file" id="id_imagem" name="imagem" multiple required class="form-control">
+            </div>
+            <div class="row form-group my-3">
+                <div class="col-12 col-lg-12 text-center">
+                    <input type="submit" value="Enviar" class="btn btn-success">
+                    <a class="btn btn-secondary" href="/galeria-list/{{ request.session.id_curso }}">Cancelar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+  </div>
+
+
+    
+
+{% endblock %}

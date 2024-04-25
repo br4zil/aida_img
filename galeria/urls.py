@@ -1,7 +1,8 @@
 from django.urls import path
-from galeria.views import galeria, galeriaList
+from galeria.views import galeria, galeriaList, galeriaUpload
 
 urlpatterns = [
     path('galeria', galeria, name='galeria'), 
+    path('galeria-upload', galeriaUpload, name='galeria-upload'), 
     path('galeria-list/<int:id_curso>', galeriaList, name='galeria-list'),
 ]
