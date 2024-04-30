@@ -24,14 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 
-os.environ['BING_SEARCH_V7_SUBSCRIPTION_KEY'] = '93d143d465e842c0bbf320521cb91171'
-os.environ['BING_SEARCH_V7_ENDPOINT'] = 'https://api.bing.microsoft.com'
+#os.environ['BING_SEARCH_V7_SUBSCRIPTION_KEY'] = '93d143d465e842c0bbf320521cb91171'
+#os.environ['BING_SEARCH_V7_ENDPOINT'] = 'https://api.bing.microsoft.com'
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['18.230.65.190', 'localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'galeria.apps.GaleriaConfig',
     'usuarios.apps.UsuariosConfig',
     'cursos.apps.CursosConfig',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -121,10 +122,44 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+
+
+
+# ...
+
+# AWS Configuração
+AWS_ACCESS_KEY_ID = str(os.getenv('AWS_ACCESS_KEY_ID'))
+AWS_SECRET_ACCESS_KEY = str(os.getenv('AWS_SECRET_ACCESS_KEY'))
+AWS_STORAGE_BUCKET_NAME = str(os.getenv('AWS_STORAGE_BUCKET_NAME'))
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400'
+}
+AWS_LOCATION = 'static'
+AWS_QUERYSTRING_AUTH = False
+AWS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+}
+
+# ...
+
+
+
+
+
+
+# ...
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.1/howto/static-files/
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'setup/static')
@@ -132,12 +167,38 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# Media
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+
+# ...
+
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
+
+#STATIC_URL = 'static/'
+
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'setup/static')
+#]
+
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 
 # Media
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+#MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-MEDIA_URL = "/media/"
+#MEDIA_URL = "/media/"
+
+
+
+
+
 
 
 
@@ -152,3 +213,11 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
     messages.SUCCESS: 'success',
 }
+
+# DEFAULT_FILE_STORAGE: Padrão para usar o sistema de arquivos local para armazenar arquivos
+#DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# FILE_UPLOAD_MAX_MEMORY_SIZE: Tamanho máximo de um arquivo enviado em memória (antes de ser salvo em arquivo temporário)
+#FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5 MB
+
+# DATA_UPLOAD_MAX_MEMORY_SIZE: Tamanho máximo para dados de uma solicitação de upload em memória

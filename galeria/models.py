@@ -1,14 +1,28 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 import os
-import shutil
-from django.conf import settings  # Importar as configurações do Django
+from django.conf import settings
+from django.core.files.storage import default_storage
 
 def upload_to(instance, filename):
-    # Define um caminho temporário para o upload inicial na pasta 'django media'
-    return os.path.join(settings.MEDIA_ROOT, 'images', 'temp', filename)
+    # Cria o caminho de destino com base no ID do usuário e do curso
+    user_id = str(instance.curso.usuario.id)
+    curso_id = str(instance.curso.id)
+    
+    # Cria um novo nome de arquivo ou usa o existente
+    file_extension = os.path.splitext(filename)[-1]
+    novo_id = ImagensCurso.objects.aggregate(max_id=models.Max('id'))['max_id'] or 0
+    novo_id += 1
+    novo_nome_arquivo = f'{novo_id}{file_extension}'
+    
+    # Caminho completo de destino com base em MEDIA_ROOT
+    caminho_destino = os.path.join('images', 'imagens_cursos', user_id, curso_id, novo_nome_arquivo)
+    
+    return caminho_destino
+
 
 class ImagensCurso(models.Model):
+    # Escolhas de classes
     NOME_IGUAL = 'IDA_igual'
     NOME_MONO = 'IDA_mono'
     NOME_COPIA = 'IDA_copia'
@@ -35,47 +49,13 @@ class ImagensCurso(models.Model):
         return self.nome_arquivo
 
     def save(self, *args, **kwargs):
-        # Verifica se a instância é nova
-        is_new_instance = not self.pk
+        # Verifica se a instância é nova (nunca foi salva antes)
+        is_new_instance = self.pk is None
 
-        # Se for uma nova instância, salva primeiro para obter um ID
-        if is_new_instance:
-            super().save(*args, **kwargs)
-
-        # Renomeia o arquivo após obter o ID
+        # Se a instância é nova e há uma imagem associada
         if is_new_instance and self.imagem:
-            # Armazena o nome original do arquivo
+            # Salve o nome original do arquivo sem o caminho no campo nome_arquivo
             self.nome_arquivo = os.path.basename(self.imagem.name)
 
-            # Obtém a extensão do arquivo original
-            file_extension = os.path.splitext(self.imagem.name)[-1]
-
-            # Renomeia o arquivo para o ID da instância com a extensão original
-            novo_nome_arquivo = f'{self.id}{file_extension}'
-
-            # Define o novo caminho para o upload usando o curso, usuário, novo nome do arquivo, e a pasta django media
-            novo_caminho = os.path.join(settings.MEDIA_ROOT, 'images', str(self.curso.usuario.id), str(self.curso.id), novo_nome_arquivo)
-
-            # Caminho absoluto para o arquivo atual
-            caminho_atual = self.imagem.path
-
-            # Novo caminho absoluto para o arquivo
-            novo_caminho_absoluto = novo_caminho
-
-            # Cria diretórios se não existirem
-            novo_caminho_dir = os.path.dirname(novo_caminho_absoluto)
-            if not os.path.exists(novo_caminho_dir):
-                os.makedirs(novo_caminho_dir)
-
-            # Mover o arquivo para o novo caminho usando shutil.move
-            shutil.move(caminho_atual, novo_caminho_absoluto)
-
-            # Atualiza o campo de imagem com o novo caminho
-            self.imagem.name = os.path.join('images', str(self.curso.usuario.id), str(self.curso.id), novo_nome_arquivo)
-
-            # Salva novamente a instância para atualizar o caminho da imagem
-            super().save(*args, **kwargs)
-
-        else:
-            # Salva a instância normalmente se não for nova
-            super().save(*args, **kwargs)
+        # Chama o método save da classe pai (models.Model) para salvar a instância
+        super().save(*args, **kwargs)
