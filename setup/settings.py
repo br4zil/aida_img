@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = str(os.getenv('SECRET_KEY'))
+SECRET_KEY = 'django-insecure-i1jh60052jm*r0gspx6#3jz8wb#a*!-hl-a@yhtr8gxr1by*xd'
 
 
 #os.environ['BING_SEARCH_V7_SUBSCRIPTION_KEY'] = '93d143d465e842c0bbf320521cb91171'
@@ -31,8 +31,9 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['18.230.65.190', 'localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['https://www.aidaimg.com', 'https://aidaimg.com', 'www.aidaimg.com','aidaimg.com','54.94.175.177', 'localhost', '127.0.0.1', '0.0.0.0']
 
+CSRF_TRUSTED_ORIGINS = ['https://www.aidaimg.com', 'https://aidaimg.com']
 
 # Application definition
 
@@ -129,9 +130,9 @@ USE_TZ = True
 # ...
 
 # AWS Configuração
-AWS_ACCESS_KEY_ID = str(os.getenv('AWS_ACCESS_KEY_ID'))
-AWS_SECRET_ACCESS_KEY = str(os.getenv('AWS_SECRET_ACCESS_KEY'))
-AWS_STORAGE_BUCKET_NAME = str(os.getenv('AWS_STORAGE_BUCKET_NAME'))
+AWS_ACCESS_KEY_ID = 'AKIAQ3EGWCE7VNGCF3FM'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'bucketaidaimg'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_DEFAULT_ACL = 'public-read'
 AWS_S3_OBJECT_PARAMETERS = {
