@@ -11,11 +11,11 @@ def login(request):
         if form.is_valid():
             usuario=form['usuario'].value()
             senha=form['senha'].value()
-        usuario = auth.authenticate(
-            request,
-            username=usuario,
-            password=senha
-        )
+            usuario = auth.authenticate(
+                request,
+                username=usuario,
+                password=senha
+            )
         if usuario is not None:
             auth.login(request, usuario)
             messages.success(request, f"{usuario} logado com sucesso!")

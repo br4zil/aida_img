@@ -23,15 +23,13 @@
                 <section class="menu-lateral">
                     <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
                         <div class="container-fluid">
-                          <a class="navbar-brand" href="#">AIDA IMG</a>
+                          {% comment %} <a class="navbar-brand" href="#">AIDA IMG</a> {% endcomment %}
+                          <img src="{% static 'assets/imagens/galeria/logo_aida_img_inline_p_nobg.png' %}" alt="Sistema para Análise de Indícios de Desonestidade Acadêmica em atividades baseadas no envio de Imagens.">
                           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                           </button>
                           <div class="collapse navbar-collapse" id="navbarNavDropdown">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">Início</a>
-                                </li>
                                 {% if request.user.username %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'cursos' %}">Cursos</a>
@@ -65,7 +63,7 @@
                     </div>
                 {% endfor %}
                 <p>&nbsp;</p>
-
     {% block content %}{% endblock%}
     {% include 'galeria/_footer.html' %}
+        
 </body>
