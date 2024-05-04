@@ -27,8 +27,11 @@ def login(request):
             messages.error(request, "Erro ao efetuar login.")
             return redirect('login')
 
+    if request.user.is_authenticated: 
+        return redirect('cursos')
+    else:
+        return render(request, 'usuarios/login.html', {"form": form})
         
-    return render(request, 'usuarios/login.html', {"form": form})
 
 
 def logout(request):
