@@ -21,7 +21,7 @@
         <tr>          
           <th scope="row">{{ curso.id }}</th>
           <td>{{ curso.nome }}</td>
-          <td>{{ curso.data }}</td>
+          <td>{{ curso.data|date:"d/m/y" }}</td>
           <td>{{ curso.instituicao }}</td>
           <td>
             <a type="button" class="btn btn-warning" href="/cursos-update/{{ curso.id }}">Editar</a>
