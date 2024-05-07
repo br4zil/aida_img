@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from datetime import datetime
 from cursos.models import Cursos
+from galeria.models import ImagensCurso
 from django.contrib import messages
 from cursos.forms import CursosForm
 from usuarios.views import validaAutenticacao
@@ -64,6 +65,15 @@ def cursosCreate(request):
 
 def cursosDelete(request, id):
     curso = Cursos.objects.get(id=id)
+    id_curso = curso.id
+    imagensCurso = ImagensCurso.objects.filter(curso_id=id_curso)
+    try:
+        for imagemCurso in imagensCurso:
+            imagemCurso.imagem.delete()
+            imagemCurso.delete()
+    except:
+        pass    
+    
     try:
         curso.delete()
     except:
