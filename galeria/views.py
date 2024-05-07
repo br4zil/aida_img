@@ -81,6 +81,9 @@ def galeria(request):
 
 
 def galeriaUpload(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "Usuário não logado.")
+        return redirect('login') 
     # Verifica se o método da requisição é POST
     if request.method == "POST":
         form = ImagensCursoForm(request.POST, request.FILES)
@@ -112,3 +115,13 @@ def galeriaUpload(request):
         form = ImagensCursoForm()
     
     return render(request, 'galeria/upload_imagens.html', {'form': form})
+
+
+def galeriaImagemDelete(request, id):
+    imagemCurso = ImagensCurso.objects.get(id=id)
+    try:
+        imagemCurso.imagem.delete()
+        imagemCurso.delete()
+    except:
+        pass
+    return redirect('/galeria-list/'+str(request.session["id_curso"]))
