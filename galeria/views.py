@@ -86,28 +86,25 @@ def galeriaUpload(request):
         form = ImagensCursoForm(request.POST, request.FILES)
         c=Cursos.objects.filter(id=request.session.get('id_curso'))
         # Se o formulário for válido, processa as imagens
-        print('--------------------1')
         if form.is_valid():
             # Obtenha a lista de imagens enviadas
             
             images = request.FILES.getlist('imagem')
-            print('--------------------2')
             
             # Processa cada imagem
             for image in images:
-                print('--------------------4')
                 # Crie uma instância de ImagensCurso para cada imagem
                 imagem_curso = ImagensCurso(
                     imagem=image,
                     curso=c[0],
                 )
                 # Salva a instância
+                imagem_curso.obs_class_sis = request.build_absolute_uri()
                 imagem_curso.save()
                 
             # Redireciona após salvar todas as imagens
             return redirect('galeria-list/'+str(c[0].id))
         else:
-            print('--------------------3')
             for field_name, error_messages in form.errors.items():
                 for error in error_messages:
                     messages.error(request, f"Erro no campo {field_name}: {error}") 

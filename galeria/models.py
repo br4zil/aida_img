@@ -15,8 +15,12 @@ def upload_to(instance, filename):
     novo_id += 1
     novo_nome_arquivo = f'{novo_id}{file_extension}'
     
-    # Caminho completo de destino com base em MEDIA_ROOT
-    caminho_destino = os.path.join('images', 'imagens_cursos', user_id, curso_id, novo_nome_arquivo)
+    if 'aidaimg.com' in instance.obs_class_sis:
+        # Caminho completo de destino com base em MEDIA_ROOT
+        caminho_destino = os.path.join('images', 'imagens_cursos', user_id, curso_id, novo_nome_arquivo)
+    else:
+        caminho_destino = os.path.join('images', 'imagens_cursosLocal', user_id, curso_id, novo_nome_arquivo)
+    instance.obs_class_sis = ''
     
     return caminho_destino
 
