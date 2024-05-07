@@ -125,3 +125,14 @@ def galeriaImagemDelete(request, id):
     except:
         pass
     return redirect('/galeria-list/'+str(request.session["id_curso"]))
+
+def galeriaImagemDeleteAll(request):
+    id_curso = request.session["id_curso"]
+    imagensCurso = ImagensCurso.objects.filter(curso_id=id_curso)
+    try:
+        for imagemCurso in imagensCurso:
+            imagemCurso.imagem.delete()
+            imagemCurso.delete()
+    except:
+        pass
+    return redirect('/galeria-list/'+str(id_curso))
