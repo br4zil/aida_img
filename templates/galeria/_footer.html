@@ -76,37 +76,38 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 <script type='text/javascript'>
+  
   function ajustarDivFooter() {
     // Seleciona a divfooter e a divespaco
     const divFooter = document.querySelector('#divfooter');
     const divEspaco = document.querySelector('#divespaco');
+    
+    // Remove a classe ou estilo que mantém divfooter oculto
+    divFooter.style.visibility = 'hidden';
 
     // Define a distância mínima superior desejada
     const distanciaMinimaSuperior = 736;
 
     // Verifica a posição atual da divfooter em relação à janela
     const posicaoFooter = divFooter.getBoundingClientRect().top;
-
+    
     // Se a posição superior do divfooter é menor que a distância mínima de 736 pixels
     if (posicaoFooter < distanciaMinimaSuperior) {
-        // Calcula quantos pixels faltam para atingir a posição de 736 pixels
+        // Calcula a diferença necessária para elevar a divfooter
         const diferenca = distanciaMinimaSuperior - posicaoFooter;
 
-        // Calcula o número de elementos <p> que precisam ser adicionados
-        // Cada elemento <p> terá uma altura padrão que pode variar (por exemplo, 16 pixels por <p>)
-        const alturaP = 16; // Altura de um <p> padrão, você pode ajustar conforme necessário
-        const numElementosParaAdicionar = Math.ceil(diferenca / alturaP);
-
-        // Adiciona os elementos <p> à divEspaco até que a divfooter esteja a pelo menos 736 pixels de distância
-        for (let i = 0; i < numElementosParaAdicionar; i++) {
-            const novoP = document.createElement('p');
-            novoP.innerHTML = '&nbsp;';
-            divEspaco.appendChild(novoP);
-        }
+        // Ajusta a margem superior de divEspaco
+        const margemAtual = parseFloat(window.getComputedStyle(divEspaco).marginTop) || 0;
+        divEspaco.style.marginTop = `${margemAtual + diferenca}px`;
     }
+
+    // Torna a divfooter visível após o ajuste
+    divFooter.style.visibility = 'visible';
 }
 
 // Execute a função quando a página carregar
 document.addEventListener('DOMContentLoaded', ajustarDivFooter);
+
+
 
 </script>

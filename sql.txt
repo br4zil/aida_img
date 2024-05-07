@@ -1,0 +1,9 @@
+-- database: c:\gilson\_Doutorado\_Projetos\aida_img\db.sqlite3
+
+-- Pressione o botão ▷ no canto superior direito da janela para executar todo o arquivo.
+
+DELETE FROM galeria_imagenscurso;
+DELETE FROM sqlite_sequence WHERE name = 'galeria_imagenscurso';
+
+DELETE FROM cursos_cursos;
+DELETE FROM sqlite_sequence WHERE name = 'cursos_cursos';
