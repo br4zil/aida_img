@@ -44,8 +44,8 @@ class ImagensCurso(models.Model):
     nome_arquivo = models.CharField(max_length=255, null=True, blank=True, verbose_name=_("Nome do Arquivo"))
     imagem = models.ImageField(upload_to=upload_to, null=True, blank=True, verbose_name=_("Imagem"))
     curso = models.ForeignKey('cursos.Cursos', null=True, blank=True, on_delete=models.CASCADE, verbose_name=_("Curso"))
-    class_sis = models.CharField(max_length=20, null=True, blank=True, choices=CLASS_CHOICES, default=NOME_IGUAL, verbose_name=_("Classificação Sistema"))
-    class_prof = models.CharField(max_length=20, null=True, blank=True, choices=CLASS_CHOICES, default=NOME_IGUAL, verbose_name=_("Classificação Professor"))
+    class_sis = models.CharField(max_length=20, null=True, blank=True, choices=CLASS_CHOICES, default=None, verbose_name=_("Classificação Sistema"))
+    class_prof = models.CharField(max_length=20, null=True, blank=True, choices=CLASS_CHOICES, default=None, verbose_name=_("Classificação Professor"))
     obs_class_sis = models.CharField(max_length=100, null=True, blank=True, verbose_name=_("Observações Sistema"))
     obs_class_prof = models.CharField(max_length=100, null=True, blank=True, verbose_name=_("Observações Professor"))
 

@@ -17,6 +17,9 @@
                   <a type="button" class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>    
                 </div>
               </div>
+              <div class="col-md-6 ">
+                <a type="button" class="btn btn-success" href="{%url 'galeria-identificarIDA' %}">Identificar IDA</a>    
+              </div>
               {% if not imagens_curso %}
                   <p>Não há imagens para este curso.</p>
               {% else %}
@@ -39,6 +42,7 @@
                         </small></small>
                         
                           <img src="{{imagem_curso.imagem.url}}" class="img-thumbnail" alt="..." title="{{ imagem_curso.nome_arquivo }}">
+                          <small>{{imagem_curso.class_sis}}</small>
                           {% comment %} <text x="50%" y="50%" fill="#eceeef" dy=".3em">{{ imagem_curso.nome_arquivo }}</text> {% endcomment %}
                         <div class="card-body">
                           {% comment %} <p class="card-text"></p> {% endcomment %}

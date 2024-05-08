@@ -106,6 +106,7 @@ def galeriaUpload(request):
                 imagem_curso.save()
                 
             # Redireciona após salvar todas as imagens
+            messages.success(request, "Imagens cadastradas com sucesso.")
             return redirect('galeria-list/'+str(c[0].id))
         else:
             for field_name, error_messages in form.errors.items():
@@ -113,7 +114,6 @@ def galeriaUpload(request):
                     messages.error(request, f"Erro no campo {field_name}: {error}") 
     else:
         form = ImagensCursoForm()
-    
     return render(request, 'galeria/upload_imagens.html', {'form': form})
 
 
@@ -124,6 +124,7 @@ def galeriaImagemDelete(request, id):
         imagemCurso.delete()
     except:
         pass
+    messages.success(request, "Exclusão realizada com sucesso.")
     return redirect('/galeria-list/'+str(request.session["id_curso"]))
 
 def galeriaImagemDeleteAll(request):
@@ -135,4 +136,22 @@ def galeriaImagemDeleteAll(request):
             imagemCurso.delete()
     except:
         pass
+    messages.success(request, "Exclusão de todas as imagens realizada com sucesso.")
+    return redirect('/galeria-list/'+str(id_curso))
+
+
+def galeriaIdentificarIDA(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "Usuário não logado.")
+        return redirect('login') 
+    id_curso = request.session["id_curso"]
+    imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso)
+    print('------------------------------------')
+    for img in imagens:
+        unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
+        print(unica_cor_imagem)
+        if unica_cor_imagem == True:
+            img.class_sis = 'IDA Mono'
+            img.save()
+    messages.success(request, "Identificação de IDA realizado com sucesso.")
     return redirect('/galeria-list/'+str(id_curso))
