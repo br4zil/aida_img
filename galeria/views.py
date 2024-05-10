@@ -73,10 +73,7 @@ def galeria(request):
             #imagens_google.append('')
         class_fotos.append(unica_cor.verifica_cor_unica(arquivo))
     fotografias_class = zip(fotografias, class_fotos)
-    
-    
-    
-    
+
     return render(request, 'galeria/index.html', {"cards":fotografias_class});
 
 
@@ -141,17 +138,54 @@ def galeriaImagemDeleteAll(request):
 
 
 def galeriaIdentificarIDA(request):
+    porc_minimo_similar = 80
     if not request.user.is_authenticated:
         messages.error(request, "Usuário não logado.")
         return redirect('login') 
+    ImagensCurso.objects.filter(curso_id=1).update(class_sis=None)    
     id_curso = request.session["id_curso"]
     imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso)
-    print('------------------------------------')
+    # print('------------------------------------')
     for img in imagens:
         unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
-        print(unica_cor_imagem)
         if unica_cor_imagem == True:
             img.class_sis = 'IDA Mono'
             img.save()
+        else:
+            ls_imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso, class_sis=None).exclude(id=img.id)
+            ls_similar_imagens = similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
+            print('/////////////////////////////////////////')
+            for i, (image_path, similarity) in enumerate(ls_similar_imagens):
+                print(f"{i+1}. Similaridade com {image_path}: {similarity*100:.2f}%")
+                print(image_path)
+                imagem = ImagensCurso.objects.filter(id=int(image_path))
+                # print(imagem)
+                # print(imagem.count())
+                # formImagensCurso = ImagensCursoForm(initial={
+                #     'nome_arquivo': imagem.nome_arquivo, 'imagem': imagem.imagem, 
+                #     'class_sis': imagem.class_sis, 'class_prof': imagem.class_prof, 
+                #     'obs_class_sis': imagem.obs_class_sis, 'obs_class_prof': imagem.obs_class_prof
+                # })
+                for i in imagem:
+                    i.class_sis = "IDA Cópia"
+                    # imagem_de_ls.obs_class_sis = ', '.join(map(str, imagem_de_ls.id))
+                    i.save()
+    
+    
+    
+    # query_image_path = os.path.join(settings.MEDIA_ROOT, "carina-nebula.png")
+    # # Lista de caminhos para as imagens no conjunto
+    # image_list = [os.path.join(settings.MEDIA_ROOT, "teste.png"),
+    #             os.path.join(settings.MEDIA_ROOT, "unicacor.png"),
+    #             os.path.join(settings.MEDIA_ROOT, "carina-nebula.png")]
+    ## Encontrar imagens semelhantes à imagem de consulta
+    # similar_images = similar_img_cnn.find_similar_images(query_image_path, image_list)
+    ## Imprimir os resultados
+    # print("................................................................")
+    # for i, (image_path, similarity) in enumerate(similar_images):
+    #    print(f"{i+1}. Similaridade com {image_path}: {similarity*100:.2f}%")
+    # print("----------------------------------------------------------------")    
+    
+    
     messages.success(request, "Identificação de IDA realizado com sucesso.")
     return redirect('/galeria-list/'+str(id_curso))

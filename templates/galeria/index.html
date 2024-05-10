@@ -8,18 +8,11 @@
               </div>
               <p>&nbsp;</p>
               <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a>
+              <a type="button" class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens...</a>    
+              <a type="button" class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>    
+              <a type="button" class="btn btn-success" href="{%url 'galeria-identificarIDA' %}">Identificar IDA</a>    
+              
               <p>&nbsp;</p>
-              <div class="row">
-                <div class="col-md-6 ">
-                  <a type="button" class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens...</a>    
-                </div>
-                <div class="col-md-6 d-flex justify-content-end">
-                  <a type="button" class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>    
-                </div>
-              </div>
-              <div class="col-md-6 ">
-                <a type="button" class="btn btn-success" href="{%url 'galeria-identificarIDA' %}">Identificar IDA</a>    
-              </div>
               {% if not imagens_curso %}
                   <p>Não há imagens para este curso.</p>
               {% else %}
