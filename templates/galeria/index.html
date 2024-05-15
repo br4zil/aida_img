@@ -138,7 +138,11 @@
                     // Função para enviar uma mensagem para iniciar a tarefa
                     $('#btn_analisarIDA').click(function(e) {
                         e.preventDefault(); // Previne o comportamento padrão do link
-                        var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
+                        if (window.location.protocol === "https:") {
+                          var socket = new WebSocket("wss://{{ request.get_host }}/progress/");
+                        } else {
+                          var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
+                        }
                         socket.onmessage = function(event) {
                           var data = JSON.parse(event.data);
                           $('.progress-container').css('display','block');
