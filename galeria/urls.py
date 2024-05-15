@@ -1,5 +1,6 @@
 from django.urls import path
 from galeria.views import galeria, galeriaList, galeriaUpload, galeriaImagemDelete, galeriaImagemDeleteAll, galeriaIdentificarIDA
+from . import consumers
 
 urlpatterns = [
     path('galeria', galeria, name='galeria'), 

@@ -1,14 +1,24 @@
 import os
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from galeria.models import ImagensCurso
 from cursos.models import Cursos
 from django.templatetags.static import static
 from django.contrib import messages
 from usuarios.views import validaAutenticacao
 from galeria.forms import ImagensCursoForm
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
+from channels.generic.websocket import WebsocketConsumer
+from channels.layers import get_channel_layer
+from asgiref.sync import sync_to_async
+from .consumers import ProgressConsumer
+import asyncio
+from django.http import StreamingHttpResponse
+import random
 
 from galeria import unica_cor
 from galeria import teste_google_image
@@ -137,55 +147,221 @@ def galeriaImagemDeleteAll(request):
     return redirect('/galeria-list/'+str(id_curso))
 
 
+
+
+# def galeriaIdentificarIDA(request):
+#     """
+#     Sends server-sent events to the client.
+#     """
+#     porc_minimo_similar = 70
+#     ImagensCurso.objects.filter(curso_id=1).update(class_sis=None)    
+#     id_curso = request.session["id_curso"]
+#     imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso)
+
+#     total_de_imagens = imagens.count
+#     i_imagem = 0    
+#     mensagem_retorno = "Iniciando"
+#     # Envia mensagem de início
+#     ProgressConsumer.update_progress("Sua mensagem aqui", "progress")
+
+     
+    
+#     for i, img in enumerate(imagens, start=1):
+#         if(i_imagem>3):
+#             break
+#         i_imagem=i_imagem+1
+#         mensagem_retorno = f"{i_imagem} de {total_de_imagens}"    
+#         # Envia mensagem de progresso atualizado
+        
+      
+        
+#         unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
+#         if unica_cor_imagem == True:
+#             img.class_sis = 'IDA Mono'
+#             img.save()
+#         else:
+#             ls_imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso, class_sis=None).exclude(id=img.id)
+#             ls_similar_imagens = similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
+#             for i, (id_similiar_imagem, similaridade_imagem) in enumerate(ls_similar_imagens):
+#                 # print(f"{i+1}. Similaridade com {id_similiar_imagem}: {similaridade_imagem*100:.2f}%")
+#                 # print(id_similiar_imagem)
+#                 imagem_atualizar_class = ImagensCurso.objects.filter(id=int(id_similiar_imagem))
+#                 for i in imagem_atualizar_class:
+#                     i.class_sis = "IDA Cópia"
+#                     # imagem_de_ls.obs_class_sis = ', '.join(map(str, imagem_de_ls.id))
+#                     i.save()
+    #return redirect('/galeria-list/'+str(request.session["id_curso"]))    
+    
+
+
 def galeriaIdentificarIDA(request):
-    porc_minimo_similar = 80
-    if not request.user.is_authenticated:
-        messages.error(request, "Usuário não logado.")
-        return redirect('login') 
-    ImagensCurso.objects.filter(curso_id=1).update(class_sis=None)    
-    id_curso = request.session["id_curso"]
-    imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso)
-    # print('------------------------------------')
-    for img in imagens:
-        unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
-        if unica_cor_imagem == True:
-            img.class_sis = 'IDA Mono'
-            img.save()
-        else:
-            ls_imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso, class_sis=None).exclude(id=img.id)
-            ls_similar_imagens = similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
-            print('/////////////////////////////////////////')
-            for i, (image_path, similarity) in enumerate(ls_similar_imagens):
-                print(f"{i+1}. Similaridade com {image_path}: {similarity*100:.2f}%")
-                print(image_path)
-                imagem = ImagensCurso.objects.filter(id=int(image_path))
-                # print(imagem)
-                # print(imagem.count())
-                # formImagensCurso = ImagensCursoForm(initial={
-                #     'nome_arquivo': imagem.nome_arquivo, 'imagem': imagem.imagem, 
-                #     'class_sis': imagem.class_sis, 'class_prof': imagem.class_prof, 
-                #     'obs_class_sis': imagem.obs_class_sis, 'obs_class_prof': imagem.obs_class_prof
-                # })
-                for i in imagem:
-                    i.class_sis = "IDA Cópia"
-                    # imagem_de_ls.obs_class_sis = ', '.join(map(str, imagem_de_ls.id))
-                    i.save()
+    messages.success(request, "Análise realizada com sucesso.")
+    return redirect('/galeria-list/'+str(request.session["id_curso"]))    
+    
+        
+      
+        
+
+
+
+
+
+
+
+# # Função de callback para atualizar o progresso
+# def atualizar_progresso(mensagem):
+#     channel_layer = get_channel_layer()
+#     async_to_sync(channel_layer.group_send)(
+#         'progress_group',  # Nome do grupo de WebSocket
+#         {
+#             'type': 'update_progress',
+#             'message': mensagem,
+#         }
+#     )  
+
+
+# def galeriaIdentificarIDA(request):
+#     # if not request.user.is_authenticated:
+#     #     messages.error(request, "Usuário não logado.")
+#     #     return redirect('login') 
+
+#     porc_minimo_similar = 70
+#     ImagensCurso.objects.filter(curso_id=1).update(class_sis=None)    
+#     id_curso = request.session["id_curso"]
+#     imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso)
+
+#     total_de_imagens = imagens.count
+#     i_imagem = 0    
+#     mensagem_retorno = "Iniciando"
+#     # Envia mensagem de início
+#     atualizar_progresso(mensagem_retorno)        
+    
+#     for i, img in enumerate(imagens, start=1):
+#         if(i_imagem>1):
+#             break
+#         i_imagem=i_imagem+1
+#         mensagem_retorno = f"{i_imagem} de {total_de_imagens}"    
+#         # Envia mensagem de progresso atualizado
+#         atualizar_progresso(mensagem_retorno)        
+        
+#         unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
+#         if unica_cor_imagem == True:
+#             img.class_sis = 'IDA Mono'
+#             img.save()
+#         else:
+#             ls_imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso, class_sis=None).exclude(id=img.id)
+#             ls_similar_imagens = similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
+#             for i, (id_similiar_imagem, similaridade_imagem) in enumerate(ls_similar_imagens):
+#                 # print(f"{i+1}. Similaridade com {id_similiar_imagem}: {similaridade_imagem*100:.2f}%")
+#                 # print(id_similiar_imagem)
+#                 imagem_atualizar_class = ImagensCurso.objects.filter(id=int(id_similiar_imagem))
+#                 for i in imagem_atualizar_class:
+#                     i.class_sis = "IDA Cópia"
+#                     # imagem_de_ls.obs_class_sis = ', '.join(map(str, imagem_de_ls.id))
+#                     i.save()
+#     # Retorne a resposta com o progresso final
+#     return HttpResponse("A análise foi concluída com sucesso!")
+
+
+
+
+
+
+
+
+
+    # request.session['progresso'] = "fim"  
+    # return JsonResponse({'mensagem': 'Tarefa finalizada'})  
+    # task.status = 'COMPLETED'
+    # task.save()
+    # return JsonResponse({'task_id': task.id})
+    # messages.success(request, "Identificação de IDA realizado com sucesso.")
+    #return HttpResponse("Processamento completo")
+    #return JsonResponse({'progress': 100, 'message': 'Análise concluída.'})
     
     
-    
-    # query_image_path = os.path.join(settings.MEDIA_ROOT, "carina-nebula.png")
-    # # Lista de caminhos para as imagens no conjunto
-    # image_list = [os.path.join(settings.MEDIA_ROOT, "teste.png"),
-    #             os.path.join(settings.MEDIA_ROOT, "unicacor.png"),
-    #             os.path.join(settings.MEDIA_ROOT, "carina-nebula.png")]
-    ## Encontrar imagens semelhantes à imagem de consulta
-    # similar_images = similar_img_cnn.find_similar_images(query_image_path, image_list)
-    ## Imprimir os resultados
-    # print("................................................................")
-    # for i, (image_path, similarity) in enumerate(similar_images):
-    #    print(f"{i+1}. Similaridade com {image_path}: {similarity*100:.2f}%")
-    # print("----------------------------------------------------------------")    
+# def check_progress(request):
+#     task_id = request.GET.get('task_id')
+#     task = Task.objects.get(id=task_id)
+#     return JsonResponse({
+#         'status': task.status,
+#         'progress': task.progress
+#     })    
     
     
-    messages.success(request, "Identificação de IDA realizado com sucesso.")
-    return redirect('/galeria-list/'+str(id_curso))
+# def start_task(request):
+#     task = Task.objects.create(name='AnalisarDA')
+#     return JsonResponse({'task_id': task.id})    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @shared_task(bind=True)
+# def galeriaIdentificarIDA(request):
+#     if not request.user.is_authenticated:
+#         messages.error(request, "Usuário não logado.")
+#         return redirect('login') 
+
+#     porc_minimo_similar = 70
+#     ImagensCurso.objects.filter(curso_id=1).update(class_sis=None)    
+#     id_curso = request.session["id_curso"]
+#     imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso)
+
+#     total_de_imagens = imagens.count
+#     i_imagem = 0    
+#     task = Task.objects.create(name='AnalisarDA')
+    
+#     for img in imagens:
+#         i_imagem=i_imagem+1
+        
+        
+#         task.progress = i_imagem*10 #
+#         task.save() #
+        
+        
+#         # progresso = f"{i_imagem} de {total_de_imagens}"
+#         # async_to_sync(channel_layer.group_send)(
+#         #     'progresso', {'type': 'receber_progresso', 'progresso': progresso}
+#         # )
+#         unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
+#         if unica_cor_imagem == True:
+#             img.class_sis = 'IDA Mono'
+#             img.save()
+#         else:
+#             ls_imagens = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso, class_sis=None).exclude(id=img.id)
+#             ls_similar_imagens = similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
+#             for i, (id_similiar_imagem, similaridade_imagem) in enumerate(ls_similar_imagens):
+#                 # print(f"{i+1}. Similaridade com {id_similiar_imagem}: {similaridade_imagem*100:.2f}%")
+#                 # print(id_similiar_imagem)
+#                 imagem_atualizar_class = ImagensCurso.objects.filter(id=int(id_similiar_imagem))
+#                 for i in imagem_atualizar_class:
+#                     i.class_sis = "IDA Cópia"
+#                     # imagem_de_ls.obs_class_sis = ', '.join(map(str, imagem_de_ls.id))
+#                     i.save()
+        
+#     # request.session['progresso'] = "fim"
+#     # return JsonResponse({'mensagem': 'Tarefa finalizada'})  
+#     task.status = 'COMPLETED'
+#     task.save()
+#     return JsonResponse({'task_id': task.id})
+#     # messages.success(request, "Identificação de IDA realizado com sucesso.")
+#     # return redirect('/galeria-list/'+str(id_curso))

@@ -38,6 +38,7 @@ CSRF_TRUSTED_ORIGINS = ['https://www.aidaimg.com', 'https://aidaimg.com']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,6 +51,10 @@ INSTALLED_APPS = [
     'storages',
 ]
 
+#
+ASGI_APPLICATION = 'setup.asgi.application'
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -59,6 +64,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+#
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
 
 ROOT_URLCONF = 'setup.urls'
 

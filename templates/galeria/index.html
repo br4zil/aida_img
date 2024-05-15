@@ -2,16 +2,78 @@
 
 {% load static %}
 {% block content %}
+
+<style>
+  .loading-icon {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #ccc;
+    border-radius: 50%;
+    border-top-color: #333;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    display: inline-block;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .progress-bar-container {
+    width: 100%;
+    height: 30px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+    display: inline-block;
+    align-items: center; /* Centraliza o ícone de carregamento verticalmente */
+  }
+  
+  .progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 2s, background-color 2s;
+  }
+  
+  
+  
+  
+  
+  
+
+
+  
+</style>
+
               <div class="card shadow-sm">  
                 <label for="">Imagens do Curso:</label>
                 <h5> {{ curso.0.nome }}  </h5>
               </div>
               <p>&nbsp;</p>
               <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a>
-              <a type="button" class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens...</a>    
-              <a type="button" class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>    
-              <a type="button" class="btn btn-success" href="{%url 'galeria-identificarIDA' %}">Identificar IDA</a>    
+              <a class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens...</a>    
+              <a class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>    
+              <a id="btn_analisarIDA" href="" class="btn btn-success">Analisar IDA</a>
               
+              <div id="progresso-analisarIDA" class="text-success"></div>
+              <div class="progress-container" style="display: none">
+                
+                
+                <div class="loading-icon"></div>
+              
+              
+                <div class="progress-bar-container">
+                  <div class="progress-bar" id="progress-bar"></div>
+                </div>
+              
+            
+              </div>         
+
+            
+
               <p>&nbsp;</p>
               {% if not imagens_curso %}
                   <p>Não há imagens para este curso.</p>
@@ -26,7 +88,7 @@
                           <title></title>
                           {% comment %} <rect width="100%" height="100%" fill="#55595c"/> {% endcomment %}
                           <small><small class="d-flex justify-content-center" title="{{ imagem_curso.nome_arquivo }}">
-                            {{ imagem_curso.id }} - 
+                            <b>{{ imagem_curso.id }}</b> - 
                             {% if imagem_curso.nome_arquivo|length > 20 %}
                                 {{ imagem_curso.nome_arquivo|slice:":20" }}...
                             {% else %}
@@ -54,5 +116,234 @@
                   </div>
                 </div>
                 {% endif %}                  
-                  
+
+
+                {% comment %} <script>
+                  var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
+
+                  socket.onmessage = function(event) {
+                      var data = JSON.parse(event.data);
+                      console.log(data.message);
+                  };
+
+                  socket.onclose = function(event) {
+                      console.log("Conexão fechada.");
+                  };
+                </script> {% endcomment %}
+
+
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                  $(document).ready(function() {
+                    // Função para enviar uma mensagem para iniciar a tarefa
+                    $('#btn_analisarIDA').click(function(e) {
+                        e.preventDefault(); // Previne o comportamento padrão do link
+                        var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
+                        socket.onmessage = function(event) {
+                          var data = JSON.parse(event.data);
+                          $('.progress-container').css('display','block');
+                          console.log(event.data);
+                          if(data.message=="Fim") {
+                            var progressContainer = document.querySelector('.progress-container');
+                            progressContainer.style.display = 'none';
+                            // Redirecionar para uma URL específica
+                            window.location.href = "http://{{ request.get_host }}/galeria-identificarIDA";
+
+                            socket.disconnect();
+                          } else {
+                            $('#progresso-analisarIDA').text("Analisando imagens: "+data.message);
+                            let vetor = data.message.split(" ");
+                            let porcentagem = vetor[0]/vetor[2]*100;
+                            updateProgressBar(porcentagem)
+                          }
+                        };
+                        socket.onclose = function(event) {
+                          //$('#progresso-analisarIDA').text(data.message);
+                        };
+
+                      function updateProgressBar(newPercentage) {
+                        var progressBarContainer = document.querySelector('.progress-bar-container');
+                        var progressBar = document.getElementById('progress-bar');
+                      
+                        var currentPercentage = parseFloat(progressBar.style.width) || 0;
+                        var totalPercentage = currentPercentage + newPercentage;
+                      
+                        if (totalPercentage > 100) {
+                          totalPercentage = 100;
+                        }
+                      
+                        var animationDuration = 3000; // 2000 milissegundos = 2 segundos
+                        var startTime = performance.now();
+                      
+                        function animateWidth() {
+                          var currentTime = performance.now();
+                          var elapsed = currentTime - startTime;
+                          var progress = elapsed / animationDuration;
+                      
+                          if (progress > 1) {
+                            progress = 1;
+                          }
+                      
+                          progressBar.style.width = (currentPercentage + (totalPercentage - currentPercentage) * progress) + '%';
+                      
+                          if (progress < 1) {
+                            requestAnimationFrame(animateWidth);
+                          } else {
+                            // Oculta a div quando a animação estiver concluída
+                            // progressBarContainer.style.display = 'none';
+                          }
+                        }
+                      
+                        animateWidth();
+                      
+                        //progressBarContainer.style.display = 'flex';
+                      }
+                      
+                      function animateColor() {
+                        var progressBar = document.getElementById('progress-bar');
+                        var currentPercentage = parseFloat(progressBar.style.width) || 0;
+                        var color = getColorForPercentage(currentPercentage);
+                        progressBar.style.backgroundColor = color;
+                      
+                        requestAnimationFrame(animateColor);
+                      }
+                      
+                      function getColorForPercentage(percentage) {
+                        var hue = ((percentage / 100) * 120).toString(10);
+                        return 'hsl(' + hue + ', 100%, 50%)';
+                      }
+                      
+                      animateColor(); // Inicia a animação de cor
+                      
+                      
+                      
+                      
+                      
+
+                      
+                      
+                      
+                      
+                      
+    
+                    });
+                });
+                
+              </script>
+
+              {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+              <script>
+                let eventSource;
+                const sseData = document.getElementById('sse-data');
+            
+                function startSSE() {
+                    eventSource = new EventSource('/galeria-identificarIDA');
+                    eventSource.onmessage = event => sseData.innerHTML += event.data + '<br>';
+                    document.querySelector('button[onclick="startSSE()"]').disabled = true;
+                    document.querySelector('button[onclick="stopSSE()"]').disabled = false;
+                }
+            
+                function stopSSE() {
+                    if (eventSource) {
+                      eventSource.close();
+                    }
+                    document.querySelector('button[onclick="startSSE()"]').disabled = false;
+                    document.querySelector('button[onclick="stopSSE()"]').disabled = true;
+                }
+            </script> {% endcomment %}
+            
+              {% comment %} <script>
+                function connectToWebSocket() {
+                    var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
+            
+                    socket.onopen = function(event) {
+                        console.log("Conexão WebSocket estabelecida.");
+                        callDjangoView();
+                    };
+            
+                    socket.onerror = function(error) {
+                        console.error("Erro na conexão WebSocket:", error);
+                    };
+            
+                    socket.onmessage = function(event) {
+                        console.log('Mensagem recebida do WebSocket:', event.data);
+                    };
+                }
+            
+                function callDjangoView() {
+                    console.log('Chamando a view do Django...');
+                    fetch('/galeria-identificarIDA')
+                        .then(response => response.text())
+                        .then(data => console.log('Resposta da view do Django:', data))
+                        .catch(error => console.error('Erro ao chamar a view do Django:', error));
+                }
+            
+                connectToWebSocket();
+            </script> {% endcomment %}
+            
+              
+
+
+              
+              {% comment %} <script>
+
+              
+                  var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
+                  $('#progress-text').text('Conectado');
+                  socket.onmessage = function(e) {
+                      console.log('teste')
+                      var progress = parseInt(e.data);
+                      console.log(progress)
+                      // Atualize a barra de progresso na sua interface com base no valor de 'progress'
+                      $('#progress-text').text('Progresso: ' + progress);
+                  };
+                </script> {% endcomment %}
+
+ 
+
+
+{% comment %} 
+$(document).ready(function() {
+  $('#btn_analisarIDA').click(function() {
+      $.ajax({
+          url: 'galeria-identificarIDA',
+          type: 'GET',
+          success: function(data) {
+              // Inicia a tarefa e obtém o ID da tarefa
+              // var task_id = data.task_id;
+              
+              // Função para verificar o progresso da tarefa
+              function checkProgress() {
+                  $.ajax({
+                      url: 'check-progres/?task_id=' + task_id,
+                      type: 'GET',
+                      success: function(data) {
+                          if (data.state == 'SUCCESS') {
+                            var progress = data.progress;
+                            $('#progress-text').text('Progresso: Fim');
+                          } else {
+                              // Tarefa ainda em andamento, atualize a barra de progresso
+                              var progress = data.progress;
+                              $('#progress-text').text('Progresso: ' + progress);
+                          }
+                      },
+                      complete: function() {
+                          // Continue verificando o progresso a cada intervalo
+                          setTimeout(checkProgress, 1000);
+                      }
+                  });
+              }
+              
+              // Inicia a verificação do progresso da tarefa
+              checkProgress();
+          }
+      });
+  });
+});
+            
+                          </script> {% endcomment %}
+              
+              
+                          
+
 {% endblock %}

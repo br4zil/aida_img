@@ -63,3 +63,4 @@ class ImagensCurso(models.Model):
 
         # Chama o método save da classe pai (models.Model) para salvar a instância
         super().save(*args, **kwargs)
+        
