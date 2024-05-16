@@ -149,8 +149,8 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           {% if imagem_curso.class_sis == 'Normal' %}
                           <span class="badge rounded-pill bg-success">{{imagem_curso.class_sis}}</span>
                           {% endif %}
-                          {% if imagem_curso.class_sis == 'None' %}
-                          <span class="badge rounded-pill bg-secondary">{{imagem_curso.class_sis}}</span>
+                          {% if imagem_curso.class_sis == None %}
+                          <span class="badge rounded-pill bg-secondary">Não analisado</span>
                           {% endif %}
                           {% if imagem_curso.class_sis == 'IDA Mono' or imagem_curso.class_sis == 'IDA Cópia' %}
                             <span class="badge rounded-pill bg-danger">{{imagem_curso.class_sis}}</span>
@@ -207,7 +207,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           var data = JSON.parse(event.data);
                           $('.progress-container').css('display','block');
                           $('#divloadicon').css('display','inline-block');
-                          console.log(event.data);
+                          //console.log(event.data);
                           if(data.message=="Fim") {
                             var progressContainer = document.querySelector('.progress-container');
                             progressContainer.style.display = 'none';
@@ -218,7 +218,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           } else {
                             $('#progresso-analisarIDA').text("Aguarde.. analisando imagens: "+data.message);
                             let vetor = data.message.split(" ");
-                            let porcentagem = vetor[0]/vetor[2]*100;
+                            let porcentagem = 1/vetor[2]*100;
                             updateProgressBar(porcentagem)
                           }
                         };
@@ -248,8 +248,13 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           if (progress > 1) {
                             progress = 1;
                           }
-                      
-                          progressBar.style.width = (currentPercentage + (totalPercentage - currentPercentage) * progress) + '%';
+                          
+                          //console.log("new "+newPercentage)
+                          //console.log("cur "+currentPercentage)
+                          //console.log("pro "+progress)
+                          //console.log("tot "+totalPercentage)
+                          //progressBar.style.width = (currentPercentage + (totalPercentage - currentPercentage) * progress) + '%';
+                          progressBar.style.width = totalPercentage + '%';
                       
                           if (progress < 1) {
                             requestAnimationFrame(animateWidth);

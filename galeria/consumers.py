@@ -58,25 +58,25 @@ class ProgressConsumer(AsyncWebsocketConsumer):
             mensagem_retorno = f"{i_imagem} de {total_de_imagens}"    
             # Envia mensagem de progresso atualizado
             await self.update_progress(mensagem_retorno, self.channel_name)
-            
-            unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
-            if unica_cor_imagem:
-                img.class_sis = 'IDA Mono'
-                await sync_to_async(img.save)()
-            else:
-                # Consulta assíncrona ao banco de dados usando sync_to_async
-                ls_imagens_async = ImagensCurso.objects.filter(curso_id=1, class_sis=None).exclude(id=img.id).order_by("id")
-                ls_imagens = await sync_to_async(list)(ls_imagens_async)
-                ls_similar_imagens = similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
-                
-                for id_similiar_imagem, similaridade_imagem in ls_similar_imagens:
+            if img.class_sis==None:
+                unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
+                if unica_cor_imagem:
+                    img.class_sis = 'IDA Mono'
+                    await sync_to_async(img.save)()
+                else:
                     # Consulta assíncrona ao banco de dados usando sync_to_async
-                    imagem_atualizar_class_async = ImagensCurso.objects.filter(id=int(id_similiar_imagem))
-                    imagens_atualizar_class = await sync_to_async(list)(imagem_atualizar_class_async)
+                    ls_imagens_async = ImagensCurso.objects.filter(curso_id=1, class_sis=None).exclude(id=img.id).order_by("id")
+                    ls_imagens = await sync_to_async(list)(ls_imagens_async)
+                    ls_similar_imagens = similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
                     
-                    for i in imagens_atualizar_class:
-                        i.class_sis = "IDA Cópia"
-                        await sync_to_async(i.save)()
+                    for id_similiar_imagem, similaridade_imagem in ls_similar_imagens:
+                        # Consulta assíncrona ao banco de dados usando sync_to_async
+                        imagem_atualizar_class_async = ImagensCurso.objects.filter(id=int(id_similiar_imagem))
+                        imagens_atualizar_class = await sync_to_async(list)(imagem_atualizar_class_async)
+                        # await sync_to_async(ImagensCurso.objects.filter(curso_id=int(id_similiar_imagem)).update)(class_sis="IDA Cópia")                  
+                        for i in imagens_atualizar_class:
+                            i.class_sis = "IDA Cópia"
+                            await sync_to_async(i.save)()
         await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None).update)(class_sis='Normal')      
         await self.update_progress("Fim", self.channel_name)
         

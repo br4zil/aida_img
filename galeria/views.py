@@ -39,7 +39,7 @@ def galeriaList(request, id_curso):
         dados_curso['total_ida_copia'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Cópia').count()
         dados_curso['total_ida_mono'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Mono').count()
         dados_curso['porc_normal'] = round(dados_curso['total_normal']/dados_curso['total']*100,2)
-        total_ida = dados_curso['total']-dados_curso['total_normal']
+        total_ida = dados_curso['total_ida_copia']+dados_curso['total_ida_mono']
         dados_curso['total_ida'] = total_ida
         dados_curso['porc_ida'] = round(total_ida/dados_curso['total']*100,2)
     
