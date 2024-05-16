@@ -8,17 +8,10 @@ from django.templatetags.static import static
 from django.contrib import messages
 from usuarios.views import validaAutenticacao
 from galeria.forms import ImagensCursoForm
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-from django.views.decorators.cache import never_cache
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from channels.generic.websocket import WebsocketConsumer
-from channels.layers import get_channel_layer
-from asgiref.sync import sync_to_async
-from .consumers import ProgressConsumer
-import asyncio
-from django.http import StreamingHttpResponse
-import random
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.db import SessionStore
 
 from galeria import unica_cor
 from galeria import teste_google_image
@@ -38,7 +31,18 @@ def galeriaList(request, id_curso):
     curso = Cursos.objects.filter(id=id_curso)
     request.session['id_curso']=curso[0].id
     request.session['nome_curso']=curso[0].nome
-    return render(request, 'galeria/index.html', {"imagens_curso":imagens_curso, "curso": curso})
+    
+    dados_curso = {'total': 0, 'total_normal': 0, 'total_copia': 0, 'total_unicacor': 0, 'porc_normal': 0, 'porc_ida': 0, 'total_ida': 0}
+    dados_curso['total'] = ImagensCurso.objects.filter(curso_id=id_curso).count()
+    dados_curso['total_normal'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal').count()
+    dados_curso['total_ida_copia'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Cópia').count()
+    dados_curso['total_ida_mono'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Mono').count()
+    dados_curso['porc_normal'] = round(dados_curso['total_normal']/dados_curso['total']*100,2)
+    total_ida = dados_curso['total']-dados_curso['total_normal']
+    dados_curso['total_ida'] = total_ida
+    dados_curso['porc_ida'] = round(total_ida/dados_curso['total']*100,2)
+    
+    return render(request, 'galeria/index.html', {"imagens_curso":imagens_curso, "curso": curso, "dados_curso": dados_curso})
 
 
 
@@ -86,6 +90,36 @@ def galeria(request):
 
     return render(request, 'galeria/index.html', {"cards":fotografias_class});
 
+# @csrf_exempt
+# def galeriaUpload(request):
+# # Se o formulário for enviado via AJAX
+#     if request.method == "POST":
+#         form = ImagensCursoForm(request.POST, request.FILES)
+#         c = Cursos.objects.filter(id=request.session.get('id_curso'))
+#         if form.is_valid():
+#             images = request.FILES.getlist('imagem')
+#             total_images = len(images)
+#             uploaded_images = 0
+            
+#             for image in images:
+#                 imagem_curso = ImagensCurso(
+#                     imagem=image,
+#                     curso=c[0],
+#                 )
+#                 imagem_curso.obs_class_sis = request.build_absolute_uri()
+#                 imagem_curso.save()
+#                 uploaded_images += 1
+                
+#             # return JsonResponse({'redirect_url': reverse('galeria-list', args=[c[0].id])})
+#         else:
+#             errors = form.errors.as_json()
+#             return JsonResponse({'errors': errors}, status=400)
+#     else:
+#         form = ImagensCursoForm()
+#     return render(request, 'galeria/upload_imagens.html', {'form': form})
+
+
+
 
 def galeriaUpload(request):
     if not request.user.is_authenticated:
@@ -124,6 +158,8 @@ def galeriaUpload(request):
     return render(request, 'galeria/upload_imagens.html', {'form': form})
 
 
+
+
 def galeriaImagemDelete(request, id):
     imagemCurso = ImagensCurso.objects.get(id=id)
     try:
@@ -133,6 +169,9 @@ def galeriaImagemDelete(request, id):
         pass
     messages.success(request, "Exclusão realizada com sucesso.")
     return redirect('/galeria-list/'+str(request.session["id_curso"]))
+
+
+
 
 def galeriaImagemDeleteAll(request):
     id_curso = request.session["id_curso"]
@@ -365,3 +404,5 @@ def galeriaIdentificarIDA(request):
 #     return JsonResponse({'task_id': task.id})
 #     # messages.success(request, "Identificação de IDA realizado com sucesso.")
 #     # return redirect('/galeria-list/'+str(id_curso))
+
+

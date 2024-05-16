@@ -32,6 +32,7 @@ class ImagensCurso(models.Model):
     NOME_COPIA = 'IDA_copia'
     NOME_COPIA_WEB = 'IDA_copia_web'
     NOME_CLASS = 'IDA_class'
+    NOME_NORMAL = 'Normal'
 
     CLASS_CHOICES = [
         (NOME_IGUAL, _('IDA Igual')),
@@ -39,6 +40,7 @@ class ImagensCurso(models.Model):
         (NOME_COPIA, _('IDA Cópia')),
         (NOME_COPIA_WEB, _('IDA Cópia Web')),
         (NOME_CLASS, _('IDA Class')),
+        (NOME_NORMAL, _('Normal')),
     ]
 
     nome_arquivo = models.CharField(max_length=255, null=True, blank=True, verbose_name=_("Nome do Arquivo"))

@@ -39,10 +39,13 @@ class ProgressConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
         porc_minimo_similar = 70
-        # ImagensCurso.objects.filter(curso_id=1).update(class_sis=None)    
-        # # id_curso = request.session["id_curso"]
+        
+        #id_curso = await sync_to_async(getCursoSessao)()
+        id_curso = self.scope['url_route']['kwargs']['id_curso']
+        await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso).update)(class_sis=None)
+        
         # Consulta assíncrona ao banco de dados usando sync_to_async
-        imagens_async = ImagensCurso.objects.filter(curso_id=1)
+        imagens_async = ImagensCurso.objects.filter(curso_id=id_curso)
         imagens = await sync_to_async(list)(imagens_async)
         imagens_sorted = sorted(imagens, key=lambda img: img.id)
 
@@ -73,7 +76,8 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     
                     for i in imagens_atualizar_class:
                         i.class_sis = "IDA Cópia"
-                        await sync_to_async(i.save)()       
+                        await sync_to_async(i.save)()
+        await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None).update)(class_sis='Normal')      
         await self.update_progress("Fim", self.channel_name)
         
         

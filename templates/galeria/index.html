@@ -48,14 +48,50 @@
   
 </style>
 
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+</script>
+
+
               <div class="card shadow-sm">  
-                <label for="">Imagens do Curso:</label>
+                <div class="card-body">
+                <label for=""><h6>Curso</h6></label>
                 <h5> {{ curso.0.nome }}  </h5>
               </div>
+              </div>
+
+
               <p>&nbsp;</p>
+              <div class="card shadow-sm">  
+                <div class="card-body">
+                <label for=""><h6>Resumo do Curso</h6></label>
+                
+                <div class="row">
+                  <div class="col-md-2">
+                    <p>&nbsp;</p>
+                    <div>Total de imagens: {{dados_curso.total}}</div>
+                    <div>Total de Normal: {{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</div>
+                    <div>Total de IDA: {{dados_curso.total_ida}} ({{dados_curso.porc_ida}}%)</div>
+                    <div>Total de Cópia: {{dados_curso.total_ida_mono}}</div>
+                    <div>Total de Mono: {{dados_curso.total_ida_mono}}</div>
+                  </div>
+                  <div class="col-md-5">
+                    <canvas id="myChart1" style="width:100%;max-width:600px"></canvas>
+                  </div>
+                  <div class="col-md-5">
+                    <canvas id="myChart2" style="width:100%;max-width:600px"></canvas>
+                  </div>
+              </div>
+              </div>
+            </div>
+              <p>&nbsp;</p>
+
+              <div class="card shadow-sm">
+                <div class="card-body">
+              <h6>Opções</h6>
               <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a>
               <a class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens...</a>    
-              <a class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>    
+              {% comment %} <a class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>     {% endcomment %}
               <a id="btn_analisarIDA" href="" class="btn btn-success">Analisar IDA</a>
               
               <div id="progresso-analisarIDA" class="text-success"></div>
@@ -70,10 +106,18 @@
                 </div>
               
             
-              </div>         
+              </div>      
+            </div>
+            </div>   
 
             
 
+              <p>&nbsp;</p>
+              <div class="card shadow-sm">
+                <div class="card-body">
+
+                <label for=""><h6> Imagens do Curso</h6></label>
+              
               <p>&nbsp;</p>
               {% if not imagens_curso %}
                   <p>Não há imagens para este curso.</p>
@@ -97,7 +141,19 @@
                         </small></small>
                         
                           <img src="{{imagem_curso.imagem.url}}" class="img-thumbnail" alt="..." title="{{ imagem_curso.nome_arquivo }}">
-                          <small>{{imagem_curso.class_sis}}</small>
+                          <div class="row">
+                            <div class="col-md-1">
+                          {% if imagem_curso.class_sis == 'Normal' %}
+                          <span class="badge rounded-pill bg-success">{{imagem_curso.class_sis}}</span>
+                          {% endif %}
+                          {% if imagem_curso.class_sis == 'None' %}
+                          <span class="badge rounded-pill bg-secondary">{{imagem_curso.class_sis}}</span>
+                          {% endif %}
+                          {% if imagem_curso.class_sis == 'IDA Mono' or imagem_curso.class_sis == 'IDA Cópia' %}
+                            <span class="badge rounded-pill bg-danger">{{imagem_curso.class_sis}}</span>
+                          {% endif %}
+                        </div>
+                        </div>
                           {% comment %} <text x="50%" y="50%" fill="#eceeef" dy=".3em">{{ imagem_curso.nome_arquivo }}</text> {% endcomment %}
                         <div class="card-body">
                           {% comment %} <p class="card-text"></p> {% endcomment %}
@@ -116,7 +172,8 @@
                   </div>
                 </div>
                 {% endif %}                  
-
+              </div>
+                </div>
 
                 {% comment %} <script>
                   var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
@@ -139,9 +196,9 @@
                     $('#btn_analisarIDA').click(function(e) {
                         e.preventDefault(); // Previne o comportamento padrão do link
                         if (window.location.protocol === "https:") {
-                          var socket = new WebSocket("wss://{{ request.get_host }}/progress/");
+                          var socket = new WebSocket("wss://{{ request.get_host }}/progress/{{ curso.0.id }}/");
                         } else {
-                          var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
+                          var socket = new WebSocket("ws://{{ request.get_host }}/progress/{{ curso.0.id }}/");
                         }
                         socket.onmessage = function(event) {
                           var data = JSON.parse(event.data);
@@ -234,6 +291,62 @@
                 });
                 
               </script>
+
+
+              <script>
+                const xValues = ["Normal", "IDA"];
+                const yValues = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}+{{dados_curso.total_ida_mono}}];
+                const barColors = [
+                "#00aba9",
+                "#b91d47",
+                  
+                ];
+                
+                new Chart("myChart1", {
+                  type: "pie",
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      backgroundColor: barColors,
+                      data: yValues
+                    }]
+                  },
+                  options: {
+                    title: {
+                      display: true,
+                      text: "Indícios de Desonestidade Acadêmica"
+                    }
+                  }
+                });
+                </script>   
+                
+                <script>
+                  const xValues2 = ["Normal", "Cópia", "Mono"];
+                  const yValues2 = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}, {{dados_curso.total_ida_mono}}];
+                  const barColors2 = [
+                  "#00aba9",
+                  "#b91d47",
+                  "#b91d99",
+                    
+                  ];
+                  
+                  new Chart("myChart2", {
+                    type: "pie",
+                    data: {
+                      labels: xValues2,
+                      datasets: [{
+                        backgroundColor: barColors2,
+                        data: yValues2
+                      }]
+                    },
+                    options: {
+                      title: {
+                        display: true,
+                        text: "Normal, Cópia e Mono"
+                      }
+                    }
+                  });
+                  </script>
 
               {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
               <script>
