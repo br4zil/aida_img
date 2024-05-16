@@ -34,13 +34,14 @@ def galeriaList(request, id_curso):
     
     dados_curso = {'total': 0, 'total_normal': 0, 'total_copia': 0, 'total_unicacor': 0, 'porc_normal': 0, 'porc_ida': 0, 'total_ida': 0}
     dados_curso['total'] = ImagensCurso.objects.filter(curso_id=id_curso).count()
-    dados_curso['total_normal'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal').count()
-    dados_curso['total_ida_copia'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Cópia').count()
-    dados_curso['total_ida_mono'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Mono').count()
-    dados_curso['porc_normal'] = round(dados_curso['total_normal']/dados_curso['total']*100,2)
-    total_ida = dados_curso['total']-dados_curso['total_normal']
-    dados_curso['total_ida'] = total_ida
-    dados_curso['porc_ida'] = round(total_ida/dados_curso['total']*100,2)
+    if(dados_curso['total']>0):
+        dados_curso['total_normal'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal').count()
+        dados_curso['total_ida_copia'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Cópia').count()
+        dados_curso['total_ida_mono'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Mono').count()
+        dados_curso['porc_normal'] = round(dados_curso['total_normal']/dados_curso['total']*100,2)
+        total_ida = dados_curso['total']-dados_curso['total_normal']
+        dados_curso['total_ida'] = total_ida
+        dados_curso['porc_ida'] = round(total_ida/dados_curso['total']*100,2)
     
     return render(request, 'galeria/index.html', {"imagens_curso":imagens_curso, "curso": curso, "dados_curso": dados_curso})
 

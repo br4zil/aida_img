@@ -62,23 +62,27 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 
 
               <p>&nbsp;</p>
+              
+              {% if imagens_curso %}
+              
+              
               <div class="card shadow-sm">  
                 <div class="card-body">
                 <label for=""><h6>Resumo do Curso</h6></label>
                 
                 <div class="row">
-                  <div class="col-md-2">
-                    <p>&nbsp;</p>
+                  <div class="col-md-3">
+                    
                     <div>Total de imagens: {{dados_curso.total}}</div>
                     <div>Total de Normal: {{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</div>
                     <div>Total de IDA: {{dados_curso.total_ida}} ({{dados_curso.porc_ida}}%)</div>
                     <div>Total de Cópia: {{dados_curso.total_ida_mono}}</div>
                     <div>Total de Mono: {{dados_curso.total_ida_mono}}</div>
                   </div>
-                  <div class="col-md-5">
+                  <div class="col-md-4">
                     <canvas id="myChart1" style="width:100%;max-width:600px"></canvas>
                   </div>
-                  <div class="col-md-5">
+                  <div class="col-md-4">
                     <canvas id="myChart2" style="width:100%;max-width:600px"></canvas>
                   </div>
               </div>
@@ -86,21 +90,20 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
             </div>
               <p>&nbsp;</p>
 
+
+
+              {% endif %}
               <div class="card shadow-sm">
                 <div class="card-body">
               <h6>Opções</h6>
               <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a>
               <a class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens...</a>    
               {% comment %} <a class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>     {% endcomment %}
-              <a id="btn_analisarIDA" href="" class="btn btn-success">Analisar IDA</a>
+              <a id="btn_analisarIDA" href="" class="btn btn-success">Analisar IDA</a> <div class="loading-icon" id="divloadicon" style="display: none"></div>
               
               <div id="progresso-analisarIDA" class="text-success"></div>
               <div class="progress-container" style="display: none">
-                
-                
-                <div class="loading-icon"></div>
-              
-              
+             
                 <div class="progress-bar-container">
                   <div class="progress-bar" id="progress-bar"></div>
                 </div>
@@ -118,7 +121,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 
                 <label for=""><h6> Imagens do Curso</h6></label>
               
-              <p>&nbsp;</p>
+              
               {% if not imagens_curso %}
                   <p>Não há imagens para este curso.</p>
               {% else %}
@@ -203,6 +206,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                         socket.onmessage = function(event) {
                           var data = JSON.parse(event.data);
                           $('.progress-container').css('display','block');
+                          $('#divloadicon').css('display','inline-block');
                           console.log(event.data);
                           if(data.message=="Fim") {
                             var progressContainer = document.querySelector('.progress-container');
@@ -212,7 +216,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 
                             socket.disconnect();
                           } else {
-                            $('#progresso-analisarIDA').text("Analisando imagens: "+data.message);
+                            $('#progresso-analisarIDA').text("Aguarde.. analisando imagens: "+data.message);
                             let vetor = data.message.split(" ");
                             let porcentagem = vetor[0]/vetor[2]*100;
                             updateProgressBar(porcentagem)
@@ -297,7 +301,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                 const xValues = ["Normal", "IDA"];
                 const yValues = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}+{{dados_curso.total_ida_mono}}];
                 const barColors = [
-                "#00aba9",
+                "green",
                 "#b91d47",
                   
                 ];
@@ -324,7 +328,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                   const xValues2 = ["Normal", "Cópia", "Mono"];
                   const yValues2 = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}, {{dados_curso.total_ida_mono}}];
                   const barColors2 = [
-                  "#00aba9",
+                  "green",
                   "#b91d47",
                   "#b91d99",
                     
