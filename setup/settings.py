@@ -31,6 +31,9 @@ SECRET_KEY = 'django-insecure-i1jh60052jm*r0gspx6#3jz8wb#a*!-hl-a@yhtr8gxr1by*xd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Define o tempo limite HTTP em segundos
+HTTP_TIMEOUT = 300
+
 ALLOWED_HOSTS = ['https://www.aidaimg.com', 'https://aidaimg.com', 'www.aidaimg.com','aidaimg.com','54.94.175.177', 'localhost', '127.0.0.1', '0.0.0.0', '172.31.6.108', '54.233.148.161']
 
 CSRF_TRUSTED_ORIGINS = ['https://www.aidaimg.com', 'https://aidaimg.com']
@@ -63,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'galeria.middleware.TimeoutMiddleware',
 ]
 
 #
