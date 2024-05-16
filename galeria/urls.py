@@ -1,5 +1,5 @@
 from django.urls import path
-from galeria.views import galeria, galeriaList, galeriaUpload, galeriaImagemDelete, galeriaImagemDeleteAll, galeriaIdentificarIDA
+from galeria.views import galeria, galeriaList, galeriaUpload, galeriaImagemDelete, galeriaImagemDeleteAll, galeriaIdentificarIDA, galeriaIdentificarIDANoWS
 from . import consumers
 
 urlpatterns = [
@@ -9,4 +9,5 @@ urlpatterns = [
     path('galeria-imagem-delete', galeriaImagemDeleteAll, name='galeria-imagem-delete-all'),
     path('galeria-list/<int:id_curso>', galeriaList, name='galeria-list'),
     path('galeria-identificarIDA', galeriaIdentificarIDA, name='galeria-identificarIDA'),
+    path('galeria-identificarIDANoWS', galeriaIdentificarIDANoWS, name='galeria-identificarIDANoWS'),
 ]

@@ -7,3 +7,5 @@ from galeria.consumers import ProgressConsumer
 websocket_urlpatterns = [
     path("progress/<int:id_curso>/", ProgressConsumer.as_asgi()),
 ]
+
+

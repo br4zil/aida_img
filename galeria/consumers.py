@@ -65,7 +65,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     await sync_to_async(img.save)()
                 else:
                     # Consulta assíncrona ao banco de dados usando sync_to_async
-                    ls_imagens_async = ImagensCurso.objects.filter(curso_id=1, class_sis=None).exclude(id=img.id).order_by("id")
+                    ls_imagens_async = ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None).exclude(id=img.id).order_by("id")
                     ls_imagens = await sync_to_async(list)(ls_imagens_async)
                     ls_similar_imagens = similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
                     

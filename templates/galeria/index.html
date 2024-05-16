@@ -100,7 +100,8 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
               <a class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens...</a>    
               {% comment %} <a class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>     {% endcomment %}
               <a id="btn_analisarIDA" href="" class="btn btn-success">Analisar IDA</a> <div class="loading-icon" id="divloadicon" style="display: none"></div>
-              
+              {% comment %} <a id="btn_analisarIDA" href="{%url 'galeria-identificarIDANoWS' %}" class="btn btn-success">Analisar IDA</a>  {% endcomment %}
+
               <div id="progresso-analisarIDA" class="text-success"></div>
               <div class="progress-container" style="display: none">
              
@@ -178,22 +179,26 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
               </div>
                 </div>
 
-                {% comment %} <script>
-                  var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
-
-                  socket.onmessage = function(event) {
-                      var data = JSON.parse(event.data);
-                      console.log(data.message);
-                  };
-
-                  socket.onclose = function(event) {
-                      console.log("Conexão fechada.");
-                  };
-                </script> {% endcomment %}
-
 
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                {% comment %} <script>
+//botao identificarIDA sem WS                  
+                  document.addEventListener("DOMContentLoaded", function() {
+                      var form = document.getElementById("btn_analisarIDA");
+                      var mensagem = document.getElementById("divloadicon");
+                      form.addEventListener("click", function(event) {
+                          mensagem.style.display = 'inline-block';
+                          $('#progresso-analisarIDA').text("Aguarde.. analisando imagens");
+                      });
+                  });
+                  </script> {% endcomment %}
+
+
+
+
+               
                 <script>
+//ws analisa ida                  
                   $(document).ready(function() {
                     // Função para enviar uma mensagem para iniciar a tarefa
                     $('#btn_analisarIDA').click(function(e) {
@@ -284,25 +289,14 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                       }
                       
                       animateColor(); // Inicia a animação de cor
-                      
-                      
-                      
-                      
-                      
-
-                      
-                      
-                      
-                      
-                      
-    
-                    });
+                        });
                 });
                 
               </script>
 
 
               <script>
+//graficos                
                 const xValues = ["Normal", "IDA"];
                 const yValues = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}+{{dados_curso.total_ida_mono}}];
                 const barColors = [
@@ -356,6 +350,9 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                     }
                   });
                   </script>
+
+
+
 
               {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
               <script>
@@ -470,6 +467,17 @@ $(document).ready(function() {
                           </script> {% endcomment %}
               
               
-                          
+                {% comment %} <script>
+                  var socket = new WebSocket("ws://{{ request.get_host }}/progress/");
+
+                  socket.onmessage = function(event) {
+                      var data = JSON.parse(event.data);
+                      console.log(data.message);
+                  };
+
+                  socket.onclose = function(event) {
+                      console.log("Conexão fechada.");
+                  };
+                </script> {% endcomment %}                          
 
 {% endblock %}

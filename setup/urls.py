@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from usuarios.views import login
+from django.views.generic.base import TemplateView  # new
 
 
 urlpatterns = [
@@ -27,4 +28,8 @@ urlpatterns = [
     path('', include('galeria.urls')),
     path('', include('usuarios.urls')),
     path('', include('cursos.urls')),
+    path(
+        "robots.txt",
+        TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
+    ),    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
