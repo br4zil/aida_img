@@ -20,6 +20,7 @@ import asyncio
 
 from galeria.models import ImagensCurso
 from galeria import unica_cor
+from google_img_source_search import ReverseImageSearcher
 from galeria import teste_google_image
 from galeria import similar_img_cnn
 from galeria import da_class
@@ -63,7 +64,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                 if unica_cor_imagem:
                     img.class_sis = 'IDA Mono'
                     await sync_to_async(img.save)()
-                else:
+                else: # DA Cópia
                     # Consulta assíncrona ao banco de dados usando sync_to_async
                     ls_imagens_async = ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None).exclude(id=img.id).order_by("id")
                     ls_imagens = await sync_to_async(list)(ls_imagens_async)
@@ -77,6 +78,21 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                         for i in imagens_atualizar_class:
                             i.class_sis = "IDA Cópia"
                             await sync_to_async(i.save)()
+                if img.class_sis==None:#DA Copia Web
+                    rev_img_searcher = ReverseImageSearcher()
+                    res_img_search = rev_img_searcher.search(img.imagem.url)
+                    print(img.id)
+                    if len(res_img_search)>0:
+                        similaridade_imagem_web = similar_img_cnn.find_similar_2_images(img.imagem.url, res_img_search[0].image_url)
+                        # print(img.id)
+                        # print(img.imagem.url)
+                        # print(res_img_search[0].image_url)
+                        # print('------------------similar: ')
+                        # print(similaridade_imagem_web)
+                        if similaridade_imagem_web > 80:
+                            img.class_sis = 'IDA Cópia Web'
+                            await sync_to_async(img.save)()                            
+                            
         await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None).update)(class_sis='Normal')      
         await self.update_progress("Fim", self.channel_name)
         

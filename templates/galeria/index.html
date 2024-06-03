@@ -77,6 +77,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                     <div>Total de Normal: {{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</div>
                     <div>Total de IDA: {{dados_curso.total_ida}} ({{dados_curso.porc_ida}}%)</div>
                     <div>Total de Cópia: {{dados_curso.total_ida_copia}}</div>
+                    <div>Total de Cópia Web: {{dados_curso.total_ida_copia_web}}</div>
                     <div>Total de Mono: {{dados_curso.total_ida_mono}}</div>
                   </div>
                   <div class="col-md-4">
@@ -153,7 +154,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           {% if imagem_curso.class_sis == None %}
                           <span class="badge rounded-pill bg-secondary">Não analisado</span>
                           {% endif %}
-                          {% if imagem_curso.class_sis == 'IDA Mono' or imagem_curso.class_sis == 'IDA Cópia' %}
+                          {% if imagem_curso.class_sis == 'IDA Mono' or imagem_curso.class_sis == 'IDA Cópia' or imagem_curso.class_sis == 'IDA Cópia Web' %}
                             <span class="badge rounded-pill bg-danger">{{imagem_curso.class_sis}}</span>
                           {% endif %}
                         </div>
@@ -298,7 +299,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
               <script>
 //graficos                
                 const xValues = ["Normal", "IDA"];
-                const yValues = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}+{{dados_curso.total_ida_mono}}];
+                const yValues = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}+{{dados_curso.total_ida_mono}}+{{dados_curso.total_ida_copia_web}}];
                 const barColors = [
                 "#008000",
                 "#FF0000",
@@ -317,18 +318,19 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                   options: {
                     title: {
                       display: true,
-                      text: "Indícios de Desonestidade Acadêmica"
+                      text: "Indícios de Desonestidade Acadêmica (IDA)"
                     }
                   }
                 });
                 </script>   
                 
                 <script>
-                  const xValues2 = ["Normal", "Cópia", "Mono"];
-                  const yValues2 = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}, {{dados_curso.total_ida_mono}}];
+                  const xValues2 = ["Normal", "Cópia", "Cópia Web", "Mono"];
+                  const yValues2 = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}, {{dados_curso.total_ida_copia_web}}, {{dados_curso.total_ida_mono}}];
                   const barColors2 = [
                   "#008000",
                   "#FF0000",
+                  "#000000",
                   "#ffc0cb",
                     
                   ];
@@ -345,7 +347,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                     options: {
                       title: {
                         display: true,
-                        text: "Normal, Cópia e Mono"
+                        text: "Detalhes IDA"
                       }
                     }
                   });

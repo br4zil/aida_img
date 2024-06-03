@@ -32,14 +32,15 @@ def galeriaList(request, id_curso):
     request.session['id_curso']=curso[0].id
     request.session['nome_curso']=curso[0].nome
     
-    dados_curso = {'total': 0, 'total_normal': 0, 'total_copia': 0, 'total_unicacor': 0, 'porc_normal': 0, 'porc_ida': 0, 'total_ida': 0}
+    dados_curso = {'total': 0, 'total_normal': 0, 'total_copia': 0, 'total_copia_web': 0, 'total_unicacor': 0, 'porc_normal': 0, 'porc_ida': 0, 'total_ida': 0}
     dados_curso['total'] = ImagensCurso.objects.filter(curso_id=id_curso).count()
     if(dados_curso['total']>0):
         dados_curso['total_normal'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal').count()
         dados_curso['total_ida_copia'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Cópia').count()
+        dados_curso['total_ida_copia_web'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Cópia Web').count()
         dados_curso['total_ida_mono'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Mono').count()
         dados_curso['porc_normal'] = round(dados_curso['total_normal']/dados_curso['total']*100,2)
-        total_ida = dados_curso['total_ida_copia']+dados_curso['total_ida_mono']
+        total_ida = dados_curso['total_ida_copia']+dados_curso['total_ida_copia_web']+dados_curso['total_ida_mono']
         dados_curso['total_ida'] = total_ida
         dados_curso['porc_ida'] = round(total_ida/dados_curso['total']*100,2)
     

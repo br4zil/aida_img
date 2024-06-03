@@ -48,3 +48,35 @@ def find_similar_images(imagem_procurada, ls_imagens, porc_minimo_similar):
     ls_imagens_similares.sort(key=lambda x: x[1], reverse=True)
     
     return ls_imagens_similares
+
+
+def find_similar_2_images(imagem_procurada, imagem2):
+    # Extrair características da imagem de consulta
+    query_image_path = download_image_temp(imagem_procurada)
+    img = keras_image.load_img(query_image_path, target_size=(224, 224))
+    query_features = extract_features(np.expand_dims(keras_image.img_to_array(img), axis=0))
+
+    ls_imagens_similares = []
+
+    # Pré-calcular características de todas as imagens em ls_imagens
+    image_features_cache = {}
+    #for imagem_de_ls in ls_imagens:
+    image_path = download_image_temp(imagem2)
+    img = keras_image.load_img(image_path, target_size=(224, 224))
+    image_features_cache = extract_features(np.expand_dims(keras_image.img_to_array(img), axis=0))
+
+    # Calcular a similaridade entre a imagem de consulta e cada imagem na lista
+    #for imagem_de_ls in ls_imagens:
+    image_features = image_features_cache
+
+    # Calcular a similaridade usando a similaridade de cosseno entre os vetores de características
+    similaridade = cosine_similarity(query_features, image_features)[0][0]
+
+    #if (similaridade*100 > porc_minimo_similar):
+        # Adicionar a similaridade e o caminho da imagem à lista
+#        ls_imagens_similares.append((imagem_de_ls.id, similaridade))
+
+    # Ordenar a lista de imagens com base na similaridade (em ordem decrescente)
+    #ls_imagens_similares.sort(key=lambda x: x[1], reverse=True)
+    
+    return similaridade*100
