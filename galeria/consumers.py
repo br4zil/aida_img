@@ -89,7 +89,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                         # print(res_img_search[0].image_url)
                         # print('------------------similar: ')
                         # print(similaridade_imagem_web)
-                        if similaridade_imagem_web > 80:
+                        if similaridade_imagem_web > 90:
                             img.class_sis = 'IDA Cópia Web'
                             await sync_to_async(img.save)()                            
                             
