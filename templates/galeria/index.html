@@ -52,7 +52,7 @@
 src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 </script>
 
-
+{% comment %} <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a> {% endcomment %}
               <div class="card shadow-sm">  
                 <div class="card-body">
                 <label for=""><h6>Curso</h6></label>
@@ -73,12 +73,14 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                 <div class="row">
                   <div class="col-md-3">
                     
-                    <div>Total de imagens: {{dados_curso.total}}</div>
-                    <div>Total de Normal: {{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</div>
-                    <div>Total de IDA: {{dados_curso.total_ida}} ({{dados_curso.porc_ida}}%)</div>
-                    <div>Total de Cópia: {{dados_curso.total_ida_copia}}</div>
-                    <div>Total de Cópia Web: {{dados_curso.total_ida_copia_web}}</div>
-                    <div>Total de Mono: {{dados_curso.total_ida_mono}}</div>
+                    <div>Imagens: {{dados_curso.total}}</div>
+                    <div>Normal: {{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</div>
+                    <div>IDA: {{dados_curso.total_ida}} ({{dados_curso.porc_ida}}%)</div>
+                    <div>IDA Mono: {{dados_curso.total_ida_mono}}</div>
+                    <div>IDA Cópia: {{dados_curso.total_ida_copia}}</div>
+                    <div>IDA Cópia Web: {{dados_curso.total_ida_copia_web}}</div>
+                    <div>IDA Classificada (IA): {{dados_curso.total_ida_class}}</div>
+                    
                   </div>
                   <div class="col-md-4">
                     <canvas id="myChart1" style="width:100%;max-width:600px"></canvas>
@@ -96,13 +98,21 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
               {% endif %}
               <div class="card shadow-sm">
                 <div class="card-body">
-              <h6>Opções</h6>
-              <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a>
-              <a class="btn btn-success" href="{%url 'galeria-upload' %}">Enviar imagens...</a>    
+              <h6></h6>
+              <div>
+              <input type="checkbox" id="checkbox_ia">
+              <label for="checkbox_ia">Usar Inteligência Artificial (IA) na Análise</label>
+              </div>
+
+               
               {% comment %} <a class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>     {% endcomment %}
               <a id="btn_analisarIDA" href="" class="btn btn-success">Analisar IDA</a> <div class="loading-icon" id="divloadicon" style="display: none"></div>
               {% comment %} <a id="btn_analisarIDA" href="{%url 'galeria-identificarIDANoWS' %}" class="btn btn-success">Analisar IDA</a>  {% endcomment %}
-
+              
+              
+              
+              
+              
               <div id="progresso-analisarIDA" class="text-success"></div>
               <div class="progress-container" style="display: none">
              
@@ -120,7 +130,9 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
               <p>&nbsp;</p>
               <div class="card shadow-sm">
                 <div class="card-body">
-
+                  <div>
+                  <a class="btn btn-secondary" href="{%url 'galeria-upload' %}">Enviar imagens...</a>
+                  </div>
                 <label for=""><h6> Imagens do Curso</h6></label>
               
               
@@ -154,7 +166,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           {% if imagem_curso.class_sis == None %}
                           <span class="badge rounded-pill bg-secondary">Não analisado</span>
                           {% endif %}
-                          {% if imagem_curso.class_sis == 'IDA Mono' or imagem_curso.class_sis == 'IDA Cópia' or imagem_curso.class_sis == 'IDA Cópia Web' %}
+                          {% if imagem_curso.class_sis == 'IDA Mono' or imagem_curso.class_sis == 'IDA Cópia' or imagem_curso.class_sis == 'IDA Cópia Web' or imagem_curso.class_sis == 'IDA Class' %}
                             <span class="badge rounded-pill bg-danger">{{imagem_curso.class_sis}}</span>
                           {% endif %}
                         </div>
@@ -204,10 +216,18 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                     // Função para enviar uma mensagem para iniciar a tarefa
                     $('#btn_analisarIDA').click(function(e) {
                         e.preventDefault(); // Previne o comportamento padrão do link
-                        if (window.location.protocol === "https:") {
-                          var socket = new WebSocket("wss://{{ request.get_host }}/progress/{{ curso.0.id }}/");
+                        var input_checkbox = document.getElementById('checkbox_ia');
+                        var checkbox = ""
+                        if (input_checkbox.checked) {
+                          checkbox = "s/";
                         } else {
-                          var socket = new WebSocket("ws://{{ request.get_host }}/progress/{{ curso.0.id }}/");
+                          checkbox = "n/"
+                        }
+
+                        if (window.location.protocol === "https:") {
+                          var socket = new WebSocket("wss://{{ request.get_host }}/progress/{{ curso.0.id }}/"+checkbox);
+                        } else {
+                          var socket = new WebSocket("ws://{{ request.get_host }}/progress/{{ curso.0.id }}/"+checkbox);
                         }
                         socket.onmessage = function(event) {
                           var data = JSON.parse(event.data);
@@ -222,7 +242,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 
                             socket.disconnect();
                           } else {
-                            $('#progresso-analisarIDA').text("Aguarde.. analisando imagens: "+data.message);
+                            $('#progresso-analisarIDA').text("Aguarde... analisando imagens: "+data.message);
                             let vetor = data.message.split(" ");
                             let porcentagem = 1/vetor[2]*100;
                             updateProgressBar(porcentagem)
@@ -299,7 +319,9 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
               <script>
 //graficos                
                 const xValues = ["Normal", "IDA"];
-                const yValues = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}+{{dados_curso.total_ida_mono}}+{{dados_curso.total_ida_copia_web}}];
+                const yValues = [
+                                {{dados_curso.total_normal}}, 
+                                {{dados_curso.total_ida_copia}}+{{dados_curso.total_ida_mono}}+{{dados_curso.total_ida_copia_web}}+{{dados_curso.total_ida_class}}];
                 const barColors = [
                 "#008000",
                 "#FF0000",
@@ -325,14 +347,20 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                 </script>   
                 
                 <script>
-                  const xValues2 = ["Normal", "Cópia", "Cópia Web", "Mono"];
-                  const yValues2 = [{{dados_curso.total_normal}}, {{dados_curso.total_ida_copia}}, {{dados_curso.total_ida_copia_web}}, {{dados_curso.total_ida_mono}}];
+                  const xValues2 = ["Normal", "Cópia", "Cópia Web", "Mono", "Classificada (IA)"];
+                  const yValues2 = [
+                                    {{dados_curso.total_normal}}, 
+                                    {{dados_curso.total_ida_copia}}, 
+                                    {{dados_curso.total_ida_copia_web}}, 
+                                    {{dados_curso.total_ida_mono}},
+                                    {{dados_curso.total_ida_class}}
+                                  ];
                   const barColors2 = [
                   "#008000",
-                  "#FF0000",
+                  "#808080",
                   "#000000",
                   "#ffc0cb",
-                    
+                  "#FFA500 ", 
                   ];
                   
                   new Chart("myChart2", {

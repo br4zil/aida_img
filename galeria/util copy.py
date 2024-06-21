@@ -30,17 +30,16 @@ def download_image_temp(image_url):
     :param image_url: URL da imagem.
     :return: O caminho para o arquivo temporário onde a imagem foi armazenada.
     """
-    
-    #print("***********************")
-    #print(image_url)
+    print("***********************")
+    print(image_url)
     # Fazer uma solicitação GET à URL da imagem
     response = requests.get(image_url, timeout=10)
-    #print("***********************")
+    print("***********************")
     
     # Verificar se a resposta é bem-sucedida
     if response.status_code != 200:
         raise ValueError(f"Erro ao baixar a imagem: {response.status_code}")
-    #print("***********************")
+    print("***********************")
     # Criar um arquivo temporário para armazenar a imagem
     with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(image_url)[1]) as temp_file:
         # Gravar a imagem no arquivo temporário
@@ -53,7 +52,6 @@ def download_image_temp(image_url):
 # image_url = "https://bucketaidaimg.s3.amazonaws.com/static/images/imagens_cursosLocal/1/1/12.png"
 # temp_image_path = download_image_temp(image_url)
 # print(f"A imagem foi baixada para: {temp_image_path}")
-
 
 
 
@@ -71,7 +69,7 @@ def download_image_temp_urllib(image_url):
     """
     print("Starting download for:", image_url)
     try:
-        with urllib.request.urlopen(image_url, timeout=10) as response:
+        with urllib.request.urlopen(image_url, timeout=30) as response:
             if response.status != 200:
                 raise Exception(f"Failed to download image, status code: {response.status}")
             image_data = response.read()

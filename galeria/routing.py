@@ -5,7 +5,7 @@ from django.urls import path
 from galeria.consumers import ProgressConsumer
 
 websocket_urlpatterns = [
-    path("progress/<int:id_curso>/", ProgressConsumer.as_asgi()),
+    path("progress/<int:id_curso>/<str:checkbox_ia>/", ProgressConsumer.as_asgi()),
 ]
 
 
