@@ -13,6 +13,8 @@ def carregar_modelo():
     global model
     if model is None:
         caminho_model = os.path.join(settings.MEDIA_ROOT, "model_class", "Model_ResNet152V2.h5")
+        print("*******************")
+        print(caminho_model)
         if os.path.exists(caminho_model):
             model = keras.models.load_model(caminho_model)
             return True
