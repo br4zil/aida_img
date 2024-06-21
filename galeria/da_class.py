@@ -18,10 +18,10 @@ def carregar_modelo():
         caminho_model_s3 = os.path.join(settings.MEDIA_URL, caminho_model)
         
         print("*******************")
-        print(caminho_model)
+        print(caminho_model_s3)
         if default_storage.exists(caminho_model_s3):
         #if os.path.exists(caminho_model):
-            model = keras.models.load_model(caminho_model)
+            model = keras.models.load_model(caminho_model_s3)
             return True
         else:
             return False
