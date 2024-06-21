@@ -26,11 +26,19 @@ def get_s3_file_metadata(bucket_name, key):
 def baixar_arquivo_s3(url, local_path):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)  # Criar o diretório se não existir
         with open(local_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
         return True
     return False
+
+def calcular_etag(local_file_path):
+    hash_md5 = hashlib.md5()
+    with open(local_file_path, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return f'"{hash_md5.hexdigest()}"'
 
 def carregar_modelo():
     global model
@@ -52,8 +60,7 @@ def carregar_modelo():
         # Verificar se o arquivo já existe localmente e tem o mesmo tamanho e ETag
         if os.path.exists(local_file_path):
             local_file_size = os.path.getsize(local_file_path)
-            with open(local_file_path, 'rb') as f:
-                local_etag = f'"{hashlib.md5(f.read()).hexdigest()}"'
+            local_etag = calcular_etag(local_file_path)
             
             if local_file_size == s3_file_size and local_etag == s3_etag:
                 print("Arquivo já existe localmente e não foi modificado.")
