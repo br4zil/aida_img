@@ -14,7 +14,7 @@ def carregar_modelo():
     global model
     if model is None:
         #caminho_model = os.path.join(settings.MEDIA_ROOT, "model_class", "Model_ResNet152V2.h5")
-        caminho_model = os.path.join("model_class", "Model_ResNet152V2.h5")
+        caminho_model = os.path.join("static","model_class", "Model_ResNet152V2.h5")
         caminho_model_s3 = os.path.join(settings.MEDIA_URL, caminho_model)
         
         print("*******************")
