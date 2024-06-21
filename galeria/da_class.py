@@ -6,26 +6,72 @@ from functools import lru_cache
 from django.conf import settings
 from galeria.util import download_image_temp
 from django.core.files.storage import default_storage
+import hashlib
+import boto3
+import requests
+from botocore.exceptions import ClientError
 
 class_names = ['3ForaEscopo', '5Conforme']
 model = None
 
+def get_s3_file_metadata(bucket_name, key):
+    s3 = boto3.client('s3')
+    try:
+        response = s3.head_object(Bucket=bucket_name, Key=key)
+        return response['ETag'], response['ContentLength']
+    except ClientError as e:
+        print(f"Erro ao obter metadados do arquivo S3: {e}")
+        return None, None
+
+def baixar_arquivo_s3(url, local_path):
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        with open(local_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        return True
+    return False
+
 def carregar_modelo():
     global model
     if model is None:
-        #caminho_model = os.path.join(settings.MEDIA_ROOT, "model_class", "Model_ResNet152V2.h5")
-        caminho_model = os.path.join("static","model_class", "Model_ResNet152V2.h5")
-        caminho_model_s3 = "https://bucketaidaimg.s3.amazonaws.com/static/model_class/Model_ResNet152V2.h5"
+        bucket_name = 'bucketaidaimg'
+        key = 'static/model_class/Model_ResNet152V2.h5'
+        caminho_model_s3 = f"https://{bucket_name}.s3.amazonaws.com/{key}"
+        local_file_path = os.path.join(settings.MEDIA_ROOT, 'model_class', 'Model_ResNet152V2.h5')
         
         print("*******************")
         print(caminho_model_s3)
-        if default_storage.exists(caminho_model_s3):
-        #if os.path.exists(caminho_model):
-            model = keras.models.load_model(caminho_model_s3)
+
+        # Obter metadados do arquivo no S3
+        s3_etag, s3_file_size = get_s3_file_metadata(bucket_name, key)
+        if s3_etag is None or s3_file_size is None:
+            print("Erro ao obter metadados do arquivo no S3.")
+            return False
+
+        # Verificar se o arquivo já existe localmente e tem o mesmo tamanho e ETag
+        if os.path.exists(local_file_path):
+            local_file_size = os.path.getsize(local_file_path)
+            with open(local_file_path, 'rb') as f:
+                local_etag = f'"{hashlib.md5(f.read()).hexdigest()}"'
+            
+            if local_file_size == s3_file_size and local_etag == s3_etag:
+                print("Arquivo já existe localmente e não foi modificado.")
+                model = keras.models.load_model(local_file_path)
+                return True
+            else:
+                print("Arquivo local difere do arquivo no S3. Baixando novamente.")
+
+        # Baixar o arquivo do S3
+        if baixar_arquivo_s3(caminho_model_s3, local_file_path):
+            model = keras.models.load_model(local_file_path)
+            print(f"Modelo carregado com sucesso a partir de {caminho_model_s3}")
             return True
         else:
+            print(f"Falha ao baixar o modelo de {caminho_model_s3}")
             return False
     return True
+
 
 @lru_cache(maxsize=None)
 def download_and_cache_image(url):
