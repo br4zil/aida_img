@@ -5,6 +5,7 @@ from PIL import Image
 from functools import lru_cache
 from django.conf import settings
 from galeria.util import download_image_temp
+from django.core.files.storage import default_storage
 
 class_names = ['3ForaEscopo', '5Conforme']
 model = None
@@ -12,10 +13,14 @@ model = None
 def carregar_modelo():
     global model
     if model is None:
-        caminho_model = os.path.join(settings.MEDIA_ROOT, "model_class", "Model_ResNet152V2.h5")
+        #caminho_model = os.path.join(settings.MEDIA_ROOT, "model_class", "Model_ResNet152V2.h5")
+        caminho_model = os.path.join("model_class", "Model_ResNet152V2.h5")
+        caminho_model_s3 = os.path.join(settings.MEDIA_URL, caminho_model)
+        
         print("*******************")
         print(caminho_model)
-        if os.path.exists(caminho_model):
+        if default_storage.exists(caminho_model_s3):
+        #if os.path.exists(caminho_model):
             model = keras.models.load_model(caminho_model)
             return True
         else:
