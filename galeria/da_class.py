@@ -13,6 +13,8 @@ import requests
 from botocore.exceptions import ClientError
 from tensorflow.keras.applications import ResNet152V2
 from tensorflow.keras import layers
+from tensorflow.keras.layers import GlobalAveragePooling2D, BatchNormalization, Dropout, Dense
+from tensorflow.keras.models import Model
 
 class_names = ['3ForaEscopo', '5Conforme']
 model = None
@@ -115,7 +117,7 @@ def carregar_modelo_pesos():
     global model
     if model is None:
         # Definindo o caminho para o arquivo de pesos
-        model = build_model(num_classes=2)
+        model = build_model2(num_classes=2)
         local_file_path = os.path.join(settings.MEDIA_ROOT, 'model_class', 'Model_Model_ResNet152V2_weights.h5')
         print("/////////////")
         if os.path.exists(local_file_path):
@@ -175,6 +177,26 @@ def build_model(num_classes):
     model = tf.keras.Model(inputs, outputs, name=nomeRede)
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-6)
     model.compile(optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
+    return model
+
+
+
+
+
+def build_model2(num_classes):
+    IMG_SIZE = 128
+
+    # Carregar ResNet152V2 sem as camadas densas no topo
+    base_model = ResNet152V2(include_top=False, weights=None, input_shape=(IMG_SIZE, IMG_SIZE, 3))
+
+    # Adicionar camadas personalizadas no topo da ResNet152V2
+    x = GlobalAveragePooling2D()(base_model.output)
+    x = BatchNormalization()(x)
+    x = Dropout(0.2)(x)
+    outputs = Dense(num_classes, activation='softmax')(x)
+
+    model = Model(base_model.input, outputs)
+
     return model
 
 
