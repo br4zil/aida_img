@@ -76,6 +76,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     if classificacao == False:
                         erro="(Erro: Modelo IA não carregado)"
                     else:
+                        erro=""
                         if classificacao == '3ForaEscopo':
                             img.class_sis = 'IDA Class'
                             await sync_to_async(img.save)()

@@ -1,5 +1,6 @@
 import os
 from tensorflow import keras
+import tensorflow as tf
 import numpy as np
 from PIL import Image
 from functools import lru_cache
@@ -10,6 +11,8 @@ import hashlib
 import boto3
 import requests
 from botocore.exceptions import ClientError
+from tensorflow.keras.applications import ResNet152V2
+from tensorflow.keras import layers
 
 class_names = ['3ForaEscopo', '5Conforme']
 model = None
@@ -95,7 +98,7 @@ def preprocessar_imagem(image_path):
 def carregar_modelo():
     global model
     if model is None:
-        local_file_path = os.path.join(settings.MEDIA_ROOT, 'model_class', 'Model_ResNet152V2.h5')
+        local_file_path = os.path.join(settings.MEDIA_ROOT, 'model_class', 'Model_Model_ResNet152V2.h5')
         print("/////////////")
         if os.path.exists(local_file_path):
             print("***********")
@@ -108,8 +111,27 @@ def carregar_modelo():
     return True
 
 
+def carregar_modelo_pesos():
+    global model
+    if model is None:
+        # Definindo o caminho para o arquivo de pesos
+        model = build_model(num_classes=2)
+        local_file_path = os.path.join(settings.MEDIA_ROOT, 'model_class', 'Model_Model_ResNet152V2_weights.h5')
+        print("/////////////")
+        if os.path.exists(local_file_path):
+            print("***********")
+            # Carregando os pesos salvos
+            model.load_weights(local_file_path)
+            print(f"Pesos do modelo carregados com sucesso a partir de {local_file_path}")
+            return True
+        else:
+            print(f"Pesos do modelo não encontrados em {local_file_path}")
+            return False
+    return True
+
+
 def classificar_imagem(url_imagem):
-    if carregar_modelo():
+    if carregar_modelo_pesos():
         image_path = download_and_cache_image(url_imagem)
         img = preprocessar_imagem(image_path)
 
@@ -118,6 +140,42 @@ def classificar_imagem(url_imagem):
         classe_index = np.argmax(predictions)
         return class_names[classe_index]
     return False
+
+
+def build_model(num_classes):
+    IMG_SIZE = 128
+    rede = ResNet152V2
+    nomeRede = 'Model_ResNet152V2'
+    
+    data_augmentation = tf.keras.Sequential(
+        [
+            layers.RandomFlip("horizontal"),
+            layers.RandomFlip("vertical"),
+            layers.RandomRotation(0.1),
+            layers.RandomContrast(0.2),
+        ]
+    )
+    
+    inputs = layers.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
+    x = data_augmentation(inputs)
+    base_model = rede(include_top=False, input_tensor=x, weights="imagenet")
+
+    # Freeze the pretrained weights
+    base_model.trainable = False
+
+    # Rebuild top
+    x = layers.GlobalAveragePooling2D(name="avg_pool")(base_model.output)
+    x = layers.BatchNormalization()(x)
+
+    top_dropout_rate = 0.2
+    x = layers.Dropout(top_dropout_rate, name="top_dropout")(x)
+    outputs = layers.Dense(num_classes, activation="softmax", name="pred")(x)
+
+    # Compile
+    model = tf.keras.Model(inputs, outputs, name=nomeRede)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-6)
+    model.compile(optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
+    return model
 
 
 
