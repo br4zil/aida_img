@@ -40,7 +40,7 @@ def calcular_etag(local_file_path):
             hash_md5.update(chunk)
     return f'"{hash_md5.hexdigest()}"'
 
-def carregar_modelo():
+def carregar_modelo_s3():
     global model
     if model is None:
         bucket_name = 'bucketaidaimg'
@@ -89,6 +89,23 @@ def preprocessar_imagem(image_path):
     img = img.convert("RGB")
     img = img.resize((128, 128))
     return np.array(img).astype(float)
+
+
+
+def carregar_modelo():
+    global model
+    if model is None:
+        local_file_path = os.path.join(settings.MEDIA_ROOT, 'model_class', 'Model_ResNet152V2.h5')
+        
+        if os.path.exists(local_file_path):
+            model = keras.models.load_model(local_file_path)
+            print(f"Modelo carregado com sucesso a partir de {local_file_path}")
+            return True
+        else:
+            print(f"Modelo não encontrado em {local_file_path}")
+            return False
+    return True
+
 
 def classificar_imagem(url_imagem):
     if carregar_modelo():
