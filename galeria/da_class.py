@@ -96,8 +96,9 @@ def carregar_modelo():
     global model
     if model is None:
         local_file_path = os.path.join(settings.MEDIA_ROOT, 'model_class', 'Model_ResNet152V2.h5')
-        
+        print("/////////////")
         if os.path.exists(local_file_path):
+            print("***********")
             model = keras.models.load_model(local_file_path)
             print(f"Modelo carregado com sucesso a partir de {local_file_path}")
             return True
