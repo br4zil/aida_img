@@ -55,8 +55,13 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 {% comment %} <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a> {% endcomment %}
               <div class="card shadow-sm">  
                 <div class="card-body">
-                <label for=""><h6>Curso</h6></label>
+                {% comment %} <label for=""><h6>Curso</h6></label> {% endcomment %}
                 <h5> {{ curso.0.nome }}  </h5>
+                {% if curso.0.imagens_esperadas %}
+                
+                <label for=""><h6>Imagens esperadas: </h6></label>
+                <span> {{ curso.0.imagens_esperadas }}  </span>
+                {% endif %}
               </div>
               </div>
 
