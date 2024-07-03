@@ -17,8 +17,11 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from django.db import transaction
 from galeria.models import ImagensCurso
-from galeria import unica_cor, similar_img_cnn, da_class
+from cursos.models import Cursos
+from galeria import unica_cor, similar_img_cnn, da_class, da_objetos, da_clip
+from galeria.util import traduzir_pt_en, traduzir_en_pt
 from google_img_source_search import ReverseImageSearcher
+
 from asgiref.sync import sync_to_async
 
 class ProgressConsumer(AsyncWebsocketConsumer):
@@ -34,6 +37,19 @@ class ProgressConsumer(AsyncWebsocketConsumer):
         # Atualizar todas as imagens do curso para class_sis=None de forma assíncrona
         await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso).update)(class_sis=None)
 
+        # Carregar dados do curso
+        cursos_async = Cursos.objects.filter(id=id_curso)
+        curso = await sync_to_async(list)(cursos_async)
+        ls_descricao_esperada_imagens = []
+        # Verificar se o curso foi encontrado
+        if curso:
+            if curso[0].imagens_esperadas != None:
+                imagens_esperadas = curso[0].imagens_esperadas
+                imagens_esperadas_en = traduzir_pt_en(imagens_esperadas)
+                ls_descricao_esperada_imagens = imagens_esperadas_en.split(',')
+                
+        
+
         # Carregar todas as imagens do curso em lotes
         imagens_async = ImagensCurso.objects.filter(curso_id=id_curso)
         imagens = await sync_to_async(list)(imagens_async)
@@ -43,6 +59,13 @@ class ProgressConsumer(AsyncWebsocketConsumer):
         for i, img in enumerate(imagens, start=1):
             # Atualizar progresso
             await self.update_progress(f"{i} de {total_de_imagens} {erro}", self.channel_name)
+
+            # # DA objetos
+            # objetos_detectados = da_objetos.detect_objects_yolov5(img.imagem.url)
+            # print("=====================================================")
+            # for objeto in objetos_detectados:
+            #     print(f'Objetos detectados na imagem: {objeto}')
+
 
             # Verificar se a imagem tem uma cor única
             unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
@@ -80,6 +103,21 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                         if classificacao == '3ForaEscopo':
                             img.class_sis = 'IDA Class'
                             await sync_to_async(img.save)()
+
+                
+                # DA Clip
+                if len(ls_descricao_esperada_imagens) > 0:
+                    if img.class_sis is None:
+                        #string = traduzir_pt_en("desenho de um cachorro em uma camiseta")
+                        photo_objects = da_clip.get_image_objects(img.imagem.url, ls_descricao_esperada_imagens)
+                        print("=====================================================")
+                        print("Resultados para a foto:")
+                        print(img.imagem.url)
+                        for obj, prob in photo_objects:
+                            print(f"{obj}: {prob:.4f}")
+                            if obj in imagens_esperadas_en and prob>=0.9:
+                                img.class_sis = 'Normal Esperado'
+                                await sync_to_async(img.save)()
 
         # Atualizar as imagens restantes do curso para class_sis='Normal'
         await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None).update)(class_sis='Normal')

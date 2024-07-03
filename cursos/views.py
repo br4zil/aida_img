@@ -19,7 +19,7 @@ def cursosUpdate(request, id):
     curso = Cursos.objects.get(id=id)
     form = CursosForm(initial={
         'nome': curso.nome, 'professor': curso.professor, 'data': curso.data, 
-        'instituicao': curso.instituicao, 'usuario': curso.usuario
+        'instituicao': curso.instituicao, 'usuario': curso.usuario, 'imagens_esperadas': curso.imagens_esperadas
     })
     if request.method == "POST":  
         form = CursosForm(request.POST, instance=curso)  

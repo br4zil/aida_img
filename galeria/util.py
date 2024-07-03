@@ -91,3 +91,21 @@ def download_image_temp_urllib(image_url):
     except urllib.error.URLError as e:
         print(f"Failed to download image: {e}")
         raise
+    
+
+from googletrans import Translator
+
+def traduzir_en_pt(palavra_em_ingles: str) -> str:
+    translator = Translator()
+    traducao = translator.translate(palavra_em_ingles, src='en', dest='pt').text
+    return traducao
+
+def traduzir_pt_en(palavra_em_ingles: str) -> str:
+    translator = Translator()
+    traducao = translator.translate(palavra_em_ingles, src='pt', dest='en').text
+    return traducao
+
+# # Exemplo de uso
+# palavra_em_ingles = "hello"
+# palavra_em_portugues = traduzir_palavra(palavra_em_ingles)
+# print(f'A tradução de "{palavra_em_ingles}" é "{palavra_em_portugues}".')

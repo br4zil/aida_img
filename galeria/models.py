@@ -33,6 +33,7 @@ class ImagensCurso(models.Model):
     NOME_COPIA_WEB = 'IDA_copia_web'
     NOME_CLASS = 'IDA_class'
     NOME_NORMAL = 'Normal'
+    NOME_NORMAL = 'Normal Esperado'
 
     CLASS_CHOICES = [
         (NOME_IGUAL, _('IDA Igual')),

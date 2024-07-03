@@ -34,6 +34,7 @@ def galeriaList(request, id_curso):
     
     dados_curso = {'total': 0, 
                    'total_normal': 0, 
+                   'total_normal_esperado': 0, 
                    'total_ida_copia': 0, 
                    'total_ida_copia_web': 0, 
                    'total_ida_class': 0, 
@@ -43,7 +44,8 @@ def galeriaList(request, id_curso):
                    'total_ida': 0}
     dados_curso['total'] = ImagensCurso.objects.filter(curso_id=id_curso).count()
     if(dados_curso['total']>0):
-        dados_curso['total_normal'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal').count()
+        dados_curso['total_normal'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal').count()+ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal Esperado').count()
+        dados_curso['total_normal_esperado'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal Esperado').count()        
         dados_curso['total_ida_copia'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Cópia').count()
         dados_curso['total_ida_copia_web'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Cópia Web').count()
         dados_curso['total_ida_class'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA Class').count()

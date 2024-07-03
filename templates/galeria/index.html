@@ -75,6 +75,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                     
                     <div>Imagens: {{dados_curso.total}}</div>
                     <div>Normal: {{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</div>
+                    <div>Normal Esperado: {{dados_curso.total_normal_esperado}}</div>
                     <div>IDA: {{dados_curso.total_ida}} ({{dados_curso.porc_ida}}%)</div>
                     <div>IDA Mono: {{dados_curso.total_ida_mono}}</div>
                     <div>IDA Cópia: {{dados_curso.total_ida_copia}}</div>
@@ -160,7 +161,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           <img src="{{imagem_curso.imagem.url}}" class="img-thumbnail" alt="..." title="{{ imagem_curso.nome_arquivo }}">
                           <div class="row">
                             <div class="col-md-1">
-                          {% if imagem_curso.class_sis == 'Normal' %}
+                          {% if imagem_curso.class_sis == 'Normal' or imagem_curso.class_sis == 'Normal Esperado' %}
                           <span class="badge rounded-pill bg-success">{{imagem_curso.class_sis}}</span>
                           {% endif %}
                           {% if imagem_curso.class_sis == None %}
