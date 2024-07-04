@@ -18,7 +18,7 @@ import json
 from django.db import transaction
 from galeria.models import ImagensCurso
 from cursos.models import Cursos
-from galeria import unica_cor, similar_img_cnn, da_class, da_objetos, da_clip
+from galeria import unica_cor, similar_img_cnn, da_class, da_objetos, da_clip, da_gen_ia
 from galeria.util import traduzir_pt_en, traduzir_en_pt
 from google_img_source_search import ReverseImageSearcher
 
@@ -67,6 +67,23 @@ class ProgressConsumer(AsyncWebsocketConsumer):
             #     print(f'Objetos detectados na imagem: {objeto}')
 
 
+            # #DA GEN IMG
+            # if img.class_sis is None:
+            #     resultado = da_gen_ia.detect_image(img.imagem.url)
+            #     print("=====================================================")
+            #     print("Resultados imagem GEN IA:")
+            #     print(img.imagem.url)
+            #     print(resultado)
+            
+            
+            # #DA GEN IMG
+            # if img.class_sis is None:
+            #     resultado = da_gen_ia.analisar_imagem(img.imagem.url)
+            #     print("=====================================================")
+            #     print("Resultados imagem GEN IA:")
+            #     print(img.imagem.url)
+            #     print(resultado)
+
             # Verificar se a imagem tem uma cor única
             unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
             if unica_cor_imagem:
@@ -90,7 +107,10 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     rev_img_searcher = ReverseImageSearcher()
                     res_img_search = rev_img_searcher.search(img.imagem.url)
                     if res_img_search and similar_img_cnn.find_similar_2_images(img.imagem.url, res_img_search[0].image_url) > 90:
+                        # print('===================================')
+                        # print(res_img_search[0].page_url)
                         img.class_sis = 'IDA Cópia Web'
+                        img.obs_class_sis = res_img_search[0].page_url 
                         await sync_to_async(img.save)()
 
                 # Se ainda não classificada, classificar usando o modelo da_class
@@ -110,11 +130,11 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     if img.class_sis is None:
                         #string = traduzir_pt_en("desenho de um cachorro em uma camiseta")
                         photo_objects = da_clip.get_image_objects(img.imagem.url, ls_descricao_esperada_imagens)
-                        print("=====================================================")
-                        print("Resultados para a foto:")
-                        print(img.imagem.url)
+                        # print("=====================================================")
+                        # print("Resultados para a foto:")
+                        # print(img.imagem.url)
                         for obj, prob in photo_objects:
-                            print(f"{obj}: {prob:.4f}")
+                            # print(f"{obj}: {prob:.4f}")
                             if obj in imagens_esperadas_en and prob>=0.9:
                                 img.class_sis = 'Normal Esperado'
                                 await sync_to_async(img.save)()

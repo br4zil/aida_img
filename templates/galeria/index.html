@@ -165,7 +165,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                         
                           <img src="{{imagem_curso.imagem.url}}" class="img-thumbnail" alt="..." title="{{ imagem_curso.nome_arquivo }}">
                           <div class="row">
-                            <div class="col-md-1">
+                            <div class="col-md-12">
                           {% if imagem_curso.class_sis == 'Normal' or imagem_curso.class_sis == 'Normal Esperado' %}
                           <span class="badge rounded-pill bg-success">{{imagem_curso.class_sis}}</span>
                           {% endif %}
@@ -175,6 +175,9 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           {% if imagem_curso.class_sis == 'IDA Mono' or imagem_curso.class_sis == 'IDA Cópia' or imagem_curso.class_sis == 'IDA Cópia Web' or imagem_curso.class_sis == 'IDA Class' %}
                             <span class="badge rounded-pill bg-danger">{{imagem_curso.class_sis}}</span>
                           {% endif %}
+                          {% if imagem_curso.class_sis == 'IDA Cópia Web' %}
+                              <a href="{{imagem_curso.obs_class_sis}}" class="btn btn-link btn-sm" target="_blank">Ver original</a>
+                          {% endif %}                               
                         </div>
                         </div>
                           {% comment %} <text x="50%" y="50%" fill="#eceeef" dy=".3em">{{ imagem_curso.nome_arquivo }}</text> {% endcomment %}
@@ -183,7 +186,6 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           <div class="d-flex justify-content-end">
                             <div class="btn-group">
                               {% comment %} <button type="button" class="btn btn-sm btn-outline-secondary">Ver</button> {% endcomment %}
-                              
                               <a href="/galeria-imagem-delete/{{ imagem_curso.id }}" class="btn btn-sm btn-outline-danger">Excluir</a>
                             </div>
                             {% comment %} <small class="text-body-secondary"></small> {% endcomment %}
