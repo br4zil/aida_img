@@ -27,7 +27,7 @@ def galeriaList(request, id_curso):
     if not request.user.is_authenticated:
         messages.error(request, "Usuário não logado.")
         return redirect('login') 
-    imagens_curso = ImagensCurso.objects.order_by("id").filter(curso_id=id_curso)
+    imagens_curso = ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso)
     curso = Cursos.objects.filter(id=id_curso)
     request.session['id_curso']=curso[0].id
     request.session['nome_curso']=curso[0].nome
