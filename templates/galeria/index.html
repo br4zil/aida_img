@@ -186,6 +186,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           {% comment %} <text x="50%" y="50%" fill="#eceeef" dy=".3em">{{ imagem_curso.nome_arquivo }}</text> {% endcomment %}
                         <div class="card-body">
                           {% comment %} <p class="card-text"></p> {% endcomment %}
+
                           <div class="d-flex justify-content-end">
                             <div class="btn-group">
                               {% comment %} <button type="button" class="btn btn-sm btn-outline-secondary">Ver</button> {% endcomment %}
@@ -193,7 +194,23 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                             </div>
                             {% comment %} <small class="text-body-secondary"></small> {% endcomment %}
                           </div>
+                          &nbsp;
+                          <div class="card">
+                            <div class="card-body">
+                              <label class="small" id="class_prof_label{{ imagem_curso.id }}" for="class_prof">Class. Prof.</label>
+                              <select name="class_prof" class="form-select form-select-sm" data-imagem-id="{{ imagem_curso.id }}">
+                                <option value=""></option>
+                                <option value="IDA_copia" {% if imagem_curso.class_prof == "IDA_copia" %}selected{% endif %}>Cópia</option>
+                                <option value="IDA_copia_web" {% if imagem_curso.class_prof == "IDA_copia_web" %}selected{% endif %}>Cópia Web</option>
+                                <option value="IDA_mono" {% if imagem_curso.class_prof == "IDA_mono" %}selected{% endif %}>Monocromático</option>
+                                <option value="Normal" {% if imagem_curso.class_prof == "Normal" %}selected{% endif %}>Normal</option>
+                                <option value="Normal Esperado" {% if imagem_curso.class_prof == "Normal Esperado" %}selected{% endif %}>Normal Esperado</option>
+                              </select>
+                            </div>
+                          </div>
                         </div>
+                        
+                        
                       </div>
                     </div>
                   {% endfor %}
@@ -391,6 +408,51 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                     }
                   });
                   </script>
+
+                  <script>
+                    $(document).ready(function() {
+                      // Cria uma nova conexão WebSocket
+                      const socket2 = new WebSocket('ws://localhost:8000/ws/update_class_prof/');
+                  
+                      // Função para tratar mensagens recebidas do servidor
+                      socket2.onmessage = function(e) {
+                        const data = JSON.parse(e.data);
+                        console.log(data.message);  // ou atualize a UI conforme necessário
+                  
+                        // Verifique se a mensagem de sucesso foi recebida
+                        if (data.status === 'success') {
+                          // Encontre a label associada ao select
+                          nome_label = '#class_prof_label'+ data.imagem_id;
+                          const labelElement = $(nome_label);
+                          
+                          // Atualize o texto da label
+                          if (!labelElement.text().includes('(Salvo)')) {
+                            labelElement.text(labelElement.text() + ' (Salvo)');
+                          }
+                        }
+                      };
+                  
+                      // Adiciona o evento 'change' ao select
+                      $('.form-select').change(function(e) {
+                        // Função para enviar dados ao servidor quando a seleção é alterada
+                        function enviarAtualizacao(selectElement) {
+                          const imagemId = $(selectElement).data('imagem-id');
+                          const classProf = $(selectElement).val();
+                  
+                          // Envia os dados como um objeto JSON
+                          socket2.send(JSON.stringify({
+                            'imagem_id': imagemId,
+                            'class_prof': classProf
+                          }));
+                        }
+                  
+                        // Chama a função para enviar os dados ao servidor
+                        enviarAtualizacao(this);
+                      });
+                    });
+                  </script>
+                  
+                  
 
 
 

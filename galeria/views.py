@@ -200,6 +200,16 @@ def galeriaImagemDeleteAll(request):
 
 
 
+def galeriaImageUpdateClassProf(request):
+    return ""
+
+
+
+
+
+
+
+
 
 # def galeriaIdentificarIDA(request):
 #     """
