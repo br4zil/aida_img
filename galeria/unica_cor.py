@@ -10,6 +10,7 @@ def verifica_cor_unica(imagemUrl):
     
     #x = 'C:/Users/gilso/Downloads/not-found.png'
     #caminho_imagem = os.path.join(settings.MEDIA_URL, imagemUrl)
+    
     response = requests.get(imagemUrl, stream=True)
     if response.status_code == 200:
         imagem_bytes = np.asarray(bytearray(response.content), dtype=np.uint8)

@@ -43,10 +43,11 @@ class ProgressConsumer(AsyncWebsocketConsumer):
         ls_descricao_esperada_imagens = []
         # Verificar se o curso foi encontrado
         if curso:
-            if len(curso[0].imagens_esperadas) > 0:
-                imagens_esperadas = curso[0].imagens_esperadas
-                imagens_esperadas_en = traduzir_pt_en(imagens_esperadas)
-                ls_descricao_esperada_imagens = imagens_esperadas_en.split(',')
+            if curso[0].imagens_esperadas:
+                if len(curso[0].imagens_esperadas) > 0:
+                    imagens_esperadas = curso[0].imagens_esperadas
+                    imagens_esperadas_en = traduzir_pt_en(imagens_esperadas)
+                    ls_descricao_esperada_imagens = imagens_esperadas_en.split(',')
                 
         
 

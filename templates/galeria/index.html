@@ -52,7 +52,10 @@
 src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 </script>
 
-{% comment %} <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a> {% endcomment %}
+
+{% comment %} INICIO DADOS DO CURSO {% endcomment %}
+
+              {% comment %} <a class="btn btn-secondary" href="{% url 'cursos' %}">Voltar</a> {% endcomment %}
               <div class="card shadow-sm">  
                 <div class="card-body">
                 {% comment %} <label for=""><h6>Curso</h6></label> {% endcomment %}
@@ -64,43 +67,183 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                 {% endif %}
               </div>
               </div>
-
+{% comment %} FIM DADOS DO CURSO {% endcomment %}
 
               <p>&nbsp;</p>
-              
+
+
+
+{% comment %} INICIO RESUMO CURSO {% endcomment %}
+
+
+
               {% if imagens_curso %}
-              
-              
+
               <div class="card shadow-sm">  
                 <div class="card-body">
-                <label for=""><h6>Resumo do Curso</h6></label>
+
+                  <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="home" aria-selected="true">Gráficos da Análise</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab" aria-controls="profile" aria-selected="false">Resumo da Análise</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab" aria-controls="contact" aria-selected="false">Comparação Sistema e Professor</button>
+                    </li>
+                  </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content" id="myTabContent">
+                  <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <canvas id="myChart1" style="width:100%;max-width:600px"></canvas>
+                      </div>
+                      <div class="col-md-6">
+                        <canvas id="myChart2" style="width:100%;max-width:600px"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="profile-tab">
+                    <p>&nbsp;</p>
+                    <div class="row">
+                      <div class="col-12 col-md-6">
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th scope="col">Tipo</th>
+                              <th scope="col" class="text-center">Total</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <th>Imagens</th>
+                              <td class="text-center">{{dados_curso.total}}</td>
+                            </tr>
+                            <tr>
+                              <th>Normal</th>
+                              <td class="text-center">{{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</td>
+                            </tr>
+                            <tr>
+                              <th>Normal Esperado</th>
+                              <td class="text-center">{{dados_curso.total_normal_esperado}}</td>
+                            </tr>
+                            <tr>
+                              <th>IDA</th>
+                              <td class="text-center">{{dados_curso.total_ida}} ({{dados_curso.porc_ida}}%)</td>
+                            </tr>
+                            <tr>
+                              <th>IDA Monocromático</th>
+                              <td class="text-center">{{dados_curso.total_ida_mono}}</td>
+                            </tr>
+                            <tr>
+                              <th>IDA Cópia</th>
+                              <td class="text-center">{{dados_curso.total_ida_copia}}</td>
+                            </tr>
+                            <tr>
+                              <th>IDA Cópia Web</th>
+                              <td class="text-center">{{dados_curso.total_ida_copia_web}}</td>
+                            </tr>
+                            <tr>
+                              <th>IDA Classificada (IA)</th>
+                              <td class="text-center">{{dados_curso.total_ida_class}}</td>
+                            </tr>
+
+                        </tbody>
+                        </table>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <p>&nbsp;</p>
+                                                  
+                      </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+                  </div>
+                  <div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="contact-tab">
+                      <p>&nbsp;</p>
+                      <div class="row">
+                        <div class="col-12 col-md-6">
+                          <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th scope="col">Tipo</th>
+                                <th scope="col" class="text-center">Análise Sistema</th>
+                                <th scope="col" class="text-center">Análise Professor</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th>Normal</th>
+                                <td class="text-center">{{dados_curso.total_normal}}</td>
+                                <td class="text-center">{{dadosComparaSisProf.normal_prof}}</td>
+                              </tr>
+                              <tr>
+                                <th>Normal Esperado</th>
+                                <td class="text-center">{{dados_curso.total_normal_esperado}}</td>
+                                <td class="text-center">{{dadosComparaSisProf.normal_esperado_prof}}</td>
+                              </tr>
+                              <tr>
+                                <th>Monocromático</th>
+                                <td class="text-center">{{dados_curso.total_ida_mono}}</td>
+                                <td class="text-center">{{dadosComparaSisProf.mono_prof}}</td>
+                              </tr>
+                              <tr>
+                                <th>Cópia</th>
+                                <td class="text-center">{{dados_curso.total_ida_copia}}</td>
+                                <td class="text-center">{{dadosComparaSisProf.copia_prof}}</td>
+                              </tr>
+                              <tr>
+                                <th>Cópia Web</th>
+                                <td class="text-center">{{dados_curso.total_ida_copia_web}}</td>
+                                <td class="text-center">{{dadosComparaSisProf.copia_web_prof}}</td>
+                              </tr>
+                              <tr>
+                                <th>Total de imagens</th>
+                                <td class="text-center" colspan="2">{{dados_curso.total}}</td>
+                              </tr>
+                              <tr>
+                                <th>Análise Sistema igual Análise Professor</th>
+                                <td class="text-center" colspan="2">{{dadosComparaSisProf.iguais}}</td>
+                              </tr>
+                          </tbody>
+                          </table>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <p>&nbsp;</p>
+                                                    
+                        </div>
+                      </div>
+
+
+
+
+                  </div>
+                </div>
                 
-                <div class="row">
-                  <div class="col-md-3">
-                    
-                    <div>Imagens: {{dados_curso.total}}</div>
-                    <div>Normal: {{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</div>
-                    <div>Normal Esperado: {{dados_curso.total_normal_esperado}}</div>
-                    <div>IDA: {{dados_curso.total_ida}} ({{dados_curso.porc_ida}}%)</div>
-                    <div>IDA Mono: {{dados_curso.total_ida_mono}}</div>
-                    <div>IDA Cópia: {{dados_curso.total_ida_copia}}</div>
-                    <div>IDA Cópia Web: {{dados_curso.total_ida_copia_web}}</div>
-                    <div>IDA Classificada (IA): {{dados_curso.total_ida_class}}</div>
-                    
-                  </div>
-                  <div class="col-md-4">
-                    <canvas id="myChart1" style="width:100%;max-width:600px"></canvas>
-                  </div>
-                  <div class="col-md-4">
-                    <canvas id="myChart2" style="width:100%;max-width:600px"></canvas>
-                  </div>
-              </div>
+                
+                
+                
               </div>
             </div>
+{% comment %} FIM RESUMO CURSO {% endcomment %}
+
               <p>&nbsp;</p>
 
 
 
+
+{% comment %} INICIO BOTÃO ANALISAR {% endcomment %}
               {% endif %}
               <div class="card shadow-sm">
                 <div class="card-body">
@@ -109,15 +252,10 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
               <input type="checkbox" id="checkbox_ia">
               <label for="checkbox_ia">Usar Inteligência Artificial (IA) na Análise</label>
               </div>
-
                
               {% comment %} <a class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>     {% endcomment %}
               <a id="btn_analisarIDA" href="" class="btn btn-success">Analisar IDA</a> <div class="loading-icon" id="divloadicon" style="display: none"></div>
               {% comment %} <a id="btn_analisarIDA" href="{%url 'galeria-identificarIDANoWS' %}" class="btn btn-success">Analisar IDA</a>  {% endcomment %}
-              
-              
-              
-              
               
               <div id="progresso-analisarIDA" class="text-success"></div>
               <div class="progress-container" style="display: none">
@@ -131,15 +269,21 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
             </div>
             </div>   
 
-            
+{% comment %} FIM BOTÃO ANALISAR {% endcomment %}            
 
               <p>&nbsp;</p>
+
+
+
+
+{% comment %} INICIO LISTAGEM IMAGENS {% endcomment %}              
+
               <div class="card shadow-sm">
                 <div class="card-body">
                   <div>
                   <a class="btn btn-secondary" href="{%url 'galeria-upload' %}">Enviar imagens...</a>
                   </div>
-                <label for=""><h6> Imagens do Curso</h6></label>
+                <label for=""><h6>Imagens do Curso</h6></label>
               
               
               {% if not imagens_curso %}
@@ -200,9 +344,9 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                               <label class="small" id="class_prof_label{{ imagem_curso.id }}" for="class_prof">Class. Prof.</label>
                               <select name="class_prof" class="form-select form-select-sm" data-imagem-id="{{ imagem_curso.id }}">
                                 <option value=""></option>
-                                <option value="IDA_copia" {% if imagem_curso.class_prof == "IDA_copia" %}selected{% endif %}>Cópia</option>
-                                <option value="IDA_copia_web" {% if imagem_curso.class_prof == "IDA_copia_web" %}selected{% endif %}>Cópia Web</option>
-                                <option value="IDA_mono" {% if imagem_curso.class_prof == "IDA_mono" %}selected{% endif %}>Monocromático</option>
+                                <option value="IDA Cópia" {% if imagem_curso.class_prof == "IDA Cópia" %}selected{% endif %}>Cópia</option>
+                                <option value="IDA Cópia Web" {% if imagem_curso.class_prof == "IDA Cópia Web" %}selected{% endif %}>Cópia Web</option>
+                                <option value="IDA Mono" {% if imagem_curso.class_prof == "IDA Mono" %}selected{% endif %}>Monocromático</option>
                                 <option value="Normal" {% if imagem_curso.class_prof == "Normal" %}selected{% endif %}>Normal</option>
                                 <option value="Normal Esperado" {% if imagem_curso.class_prof == "Normal Esperado" %}selected{% endif %}>Normal Esperado</option>
                               </select>
@@ -220,6 +364,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
               </div>
                 </div>
 
+{% comment %} FIM LISTAGEM IMAGENS {% endcomment %}              
 
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 {% comment %} <script>

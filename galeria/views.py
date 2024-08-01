@@ -12,6 +12,8 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
+from django.db.models import F
+
 
 from galeria import unica_cor
 from galeria import teste_google_image
@@ -54,9 +56,33 @@ def galeriaList(request, id_curso):
         total_ida = dados_curso['total_ida_copia']+dados_curso['total_ida_copia_web']+dados_curso['total_ida_class']+dados_curso['total_ida_mono']
         dados_curso['total_ida'] = total_ida
         dados_curso['porc_ida'] = round(total_ida/dados_curso['total']*100,2)
+        
+    dadosComparaSisProf = obterDadosComparaSisProf(curso[0].id)
     
-    return render(request, 'galeria/index.html', {"imagens_curso":imagens_curso, "curso": curso, "dados_curso": dados_curso})
+    return render(request, 'galeria/index.html', 
+                  {"imagens_curso":imagens_curso, 
+                   "curso": curso, 
+                   "dados_curso": dados_curso, 
+                   "dadosComparaSisProf": dadosComparaSisProf
+                  })
 
+
+def obterDadosComparaSisProf(id_curso):
+    dados = {'iguais':0, 
+                           'normal_prof': 0,
+                           'normal_esperado_prof': 0,
+                           'copia_prof': 0,
+                           'copia_web_prof': 0,
+                           'mono_prof': 0,
+                          }
+    dados['iguais']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_sis=F('class_prof')).count()
+    dados['normal_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='Normal').count()
+    dados['normal_esperado_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='Normal Esperado').count()
+    dados['copia_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='IDA Cópia').count()
+    dados['copia_web_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='IDA Cópia Web').count()
+    dados['mono_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='IDA Mono').count()
+    
+    return dados
 
 
 def galeria(request):
