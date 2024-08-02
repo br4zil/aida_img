@@ -1,5 +1,5 @@
 from django.urls import path
-from galeria.views import galeria, galeriaList, galeriaUpload, galeriaImagemDelete, galeriaImagemDeleteAll, galeriaIdentificarIDA, galeriaIdentificarIDANoWS
+from galeria.views import galeria, galeriaList, galeriaUpload, galeriaImagemDelete, galeriaImagemDeleteAll, galeriaIdentificarIDA, galeriaIdentificarIDANoWS, export_sql, import_sql
 from . import consumers
 
 urlpatterns = [
@@ -10,4 +10,6 @@ urlpatterns = [
     path('galeria-list/<int:id_curso>', galeriaList, name='galeria-list'),
     path('galeria-identificarIDA', galeriaIdentificarIDA, name='galeria-identificarIDA'),
     path('galeria-identificarIDANoWS', galeriaIdentificarIDANoWS, name='galeria-identificarIDANoWS'),
+    path('galeria-export-sql', export_sql, name='galeria-export-sql'),
+    path('galeria-import-sql', import_sql, name='galeria-import-sql'),
 ]

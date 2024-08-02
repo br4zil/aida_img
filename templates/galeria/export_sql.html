@@ -1,0 +1,30 @@
+{% extends 'galeria/base.html' %}
+
+{% load static %}
+{% block content %}
+
+
+
+{% comment %} <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <!-- Campo para selecionar várias imagens -->
+    <br>
+    
+    
+</form> {% endcomment %}
+
+
+
+
+<div class="card">
+    <div class="card-header">
+        <h5>SQL Exportado</h5>
+    </div>
+    <div class="card-body form-group">
+        <p>&nbsp;</p>
+        <textarea id="sqlOutput" cols="100" rows="20">{{ result_sql }}</textarea>
+    </div>
+  </div>
+
+
+{% endblock %}

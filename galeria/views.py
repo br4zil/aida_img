@@ -14,6 +14,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models import F
 from django.core.paginator import Paginator
+from django.db import connection
 
 
 from galeria import unica_cor
@@ -451,5 +452,82 @@ def galeriaIdentificarIDANoWS(request):
 #     return JsonResponse({'task_id': task.id})
 #     # messages.success(request, "Identificação de IDA realizado com sucesso.")
 #     # return redirect('/galeria-list/'+str(id_curso))
+
+
+def export_sql(request):
+    def format_value(value):
+        if value is None:
+            return 'NULL'
+        elif isinstance(value, str):
+            # Adiciona aspas simples e escapa aspas internas
+            return f"'{value.replace('\'', '\'\'')}'"
+        elif isinstance(value, bytes):
+            # Formata dados binários como texto hexadecimal (se aplicável)
+            return f"X'{value.hex()}'"
+        elif isinstance(value, (int, float)):
+            # Mantém números sem aspas
+            return str(value)
+        else:
+            # Trata todos os outros tipos de dados como string
+            return f"'{str(value).replace('\'', '\'\'')}'"
+
+    def fetch_data_as_sql(table_name):
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM {table_name}")
+            data = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            sql = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES "
+            sql += ", ".join(
+                f"({', '.join(format_value(cell) for cell in row)})"
+                for row in data
+            )
+            sql += ";"
+            return sql
+
+    # Consulta para exportar galeria_imagenscurso
+    galeria_imagenscurso_sql = fetch_data_as_sql("galeria_imagenscurso")
+
+    # Consulta para exportar cursos_cursos
+    cursos_cursos_sql = fetch_data_as_sql("cursos_cursos")
+
+    # Combina os resultados em uma string SQL
+    result_sql = galeria_imagenscurso_sql + "\n\n" + cursos_cursos_sql
+
+    # Renderiza o resultado em um textarea HTML
+    return render(request, 'galeria/export_sql.html', {'result_sql': result_sql})
+
+
+@csrf_exempt  # Para permitir o POST sem CSRF, se necessário
+def import_sql(request):
+    if request.method == 'POST':
+        sql_data = request.POST.get('sql_data', '')
+
+        if sql_data:
+            with connection.cursor() as cursor:
+                
+                cursor.execute("PRAGMA foreign_keys = OFF;")
+                # Limpa as tabelas
+                cursor.execute("DELETE FROM galeria_imagenscurso;")
+                cursor.execute("DELETE FROM cursos_cursos;")
+
+                # Reseta a sequência SQLite
+                cursor.execute("DELETE FROM sqlite_sequence WHERE name='galeria_imagenscurso';")
+                cursor.execute("DELETE FROM sqlite_sequence WHERE name='cursos_cursos';")
+
+                # Executa o SQL importado
+                try:
+                    cursor.executescript(sql_data)
+                    cursor.execute("PRAGMA foreign_keys = ON;")
+                    messages.success(request, "Dados importados com sucesso.")
+                except Exception as e:
+                    messages.error(request, f"Erro ao importar dados: {e}") 
+                    return HttpResponse(f"Erro ao importar dados: {e}")
+        else:
+            messages.error(request, f"Sem SQL") 
+        return redirect('/galeria-list/'+str(request.session["id_curso"]))    
+    else:
+        return render(request, 'galeria/import_sql.html')
+
+   
 
 
