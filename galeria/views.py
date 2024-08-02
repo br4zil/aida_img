@@ -460,7 +460,8 @@ def export_sql(request):
             return 'NULL'
         elif isinstance(value, str):
             # Adiciona aspas simples e escapa aspas internas
-            return f"'{value.replace('\'', '\'\'')}'"
+            value = value.replace("'", "''")
+            return f"'{value}'"
         elif isinstance(value, bytes):
             # Formata dados binários como texto hexadecimal (se aplicável)
             return f"X'{value.hex()}'"
