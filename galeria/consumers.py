@@ -88,7 +88,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
             # Verificar se a imagem tem uma cor única
             unica_cor_imagem = unica_cor.verifica_cor_unica(img.imagem.url)
             if unica_cor_imagem:
-                img.class_sis = 'IDA Mono'
+                img.class_sis = 'IDA_mono'
                 await sync_to_async(img.save)()
             else:
                 if img.class_sis is None:
@@ -102,7 +102,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     ids_similares = ','.join(ls_ids_similares)
                     if len(ids_similares)>0:
                         ids_similares = str(img.id)+','+ids_similares
-                        img.class_sis = "IDA Cópia"
+                        img.class_sis = "IDA_copia"
                         img.obs_class_sis = ids_similares
                         await sync_to_async(img.save)()
                     # print(ids_similares)
@@ -110,7 +110,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                         imagem_atualizar_class_async = ImagensCurso.objects.filter(id=int(id_similar_imagem))
                         imagens_atualizar_class = await sync_to_async(list)(imagem_atualizar_class_async)
                         for i in imagens_atualizar_class:
-                            i.class_sis = "IDA Cópia"
+                            i.class_sis = "IDA_copia"
                             i.obs_class_sis = ids_similares
                             await sync_to_async(i.save)()
 
@@ -123,7 +123,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     if res_img_search and similar_img_cnn.find_similar_2_images(img.imagem.url, res_img_search[0].image_url) > 90:
                         # print('===================================')
                         # print(res_img_search[0].page_url)
-                        img.class_sis = 'IDA Cópia Web'
+                        img.class_sis = 'IDA_copia_web'
                         img.obs_class_sis = res_img_search[0].page_url 
                         await sync_to_async(img.save)()
 
@@ -135,7 +135,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     else:
                         erro=""
                         if classificacao == '3ForaEscopo':
-                            img.class_sis = 'IDA Class'
+                            img.class_sis = 'IDA_class'
                             await sync_to_async(img.save)()
 
                 

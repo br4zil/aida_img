@@ -316,13 +316,13 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           {% if imagem_curso.class_sis == None %}
                           <span class="badge rounded-pill bg-secondary">Não analisado</span>
                           {% endif %}
-                          {% if imagem_curso.class_sis == 'IDA Mono' or imagem_curso.class_sis == 'IDA Cópia' or imagem_curso.class_sis == 'IDA Cópia Web' or imagem_curso.class_sis == 'IDA Class' %}
+                          {% if imagem_curso.class_sis == 'IDA_mono' or imagem_curso.class_sis == 'IDA_copia' or imagem_curso.class_sis == 'IDA_copia_web' or imagem_curso.class_sis == 'IDA_class' %}
                             <span class="badge rounded-pill bg-danger">{{imagem_curso.class_sis}}</span>
                             {% comment %} {% if imagem_curso.class_sis == 'IDA Cópia'  %}
                               {{imagem_curso.obs_class_sis}}
                             {% endif %} {% endcomment %}
                           {% endif %}
-                          {% if imagem_curso.class_sis == 'IDA Cópia Web' %}
+                          {% if imagem_curso.class_sis == 'IDA_copia_web' %}
                               <a href="{{imagem_curso.obs_class_sis}}" class="btn btn-link btn-sm" target="_blank">Ver original</a>
                           {% endif %}                               
                         </div>
@@ -338,9 +338,9 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                                 <option value=""></option>
                                 <option value="Normal" {% if imagem_curso.class_prof == "Normal" %}selected{% endif %}>Normal</option>
                                 <option value="Normal Esperado" {% if imagem_curso.class_prof == "Normal Esperado" %}selected{% endif %}>Normal Esperado</option>
-                                <option value="IDA Mono" {% if imagem_curso.class_prof == "IDA Mono" %}selected{% endif %}>Monocromático</option>
-                                <option value="IDA Cópia" {% if imagem_curso.class_prof == "IDA Cópia" %}selected{% endif %}>Cópia</option>
-                                <option value="IDA Cópia Web" {% if imagem_curso.class_prof == "IDA Cópia Web" %}selected{% endif %}>Cópia Web</option>
+                                <option value="IDA_mono" {% if imagem_curso.class_prof == "IDA_mono" %}selected{% endif %}>Monocromático</option>
+                                <option value="IDA_copia" {% if imagem_curso.class_prof == "IDA_copia" %}selected{% endif %}>Cópia</option>
+                                <option value="IDA_copia_web" {% if imagem_curso.class_prof == "IDA_copia_web" %}selected{% endif %}>Cópia Web</option>
                               </select>
                             </div>
                           </div>
