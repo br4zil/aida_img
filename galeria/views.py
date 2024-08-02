@@ -489,9 +489,12 @@ def export_sql(request):
 
     # Consulta para exportar cursos_cursos
     cursos_cursos_sql = fetch_data_as_sql("cursos_cursos")
+    
+    # Consulta para exportar cursos_cursos
+    auth_user_sql = fetch_data_as_sql("auth_user")
 
     # Combina os resultados em uma string SQL
-    result_sql = galeria_imagenscurso_sql + "\n\n" + cursos_cursos_sql
+    result_sql = galeria_imagenscurso_sql + "\n\n" + cursos_cursos_sql + "\n\n" + auth_user_sql
 
     # Renderiza o resultado em um textarea HTML
     return render(request, 'galeria/export_sql.html', {'result_sql': result_sql})
@@ -509,10 +512,12 @@ def import_sql(request):
                 # Limpa as tabelas
                 cursor.execute("DELETE FROM galeria_imagenscurso;")
                 cursor.execute("DELETE FROM cursos_cursos;")
+                cursor.execute("DELETE FROM auth_user;")
 
                 # Reseta a sequência SQLite
                 cursor.execute("DELETE FROM sqlite_sequence WHERE name='galeria_imagenscurso';")
                 cursor.execute("DELETE FROM sqlite_sequence WHERE name='cursos_cursos';")
+                cursor.execute("DELETE FROM sqlite_sequence WHERE name='auth_user';")
 
                 # Executa o SQL importado
                 try:
