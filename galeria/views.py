@@ -469,7 +469,8 @@ def export_sql(request):
             return str(value)
         else:
             # Trata todos os outros tipos de dados como string
-            return f"'{str(value).replace('\'', '\'\'')}'"
+            value = str(value).replace("'", "''")
+            return f"'{value}'"
 
     def fetch_data_as_sql(table_name):
         with connection.cursor() as cursor:
