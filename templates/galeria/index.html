@@ -293,7 +293,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                 <div class="container">
                   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-5">
                   
-                  {% for imagem_curso in imagens_curso %}
+                  {% for imagem_curso in page_obj  %}
                     <div class="col">
                       <div class="card shadow-sm">
                           <title></title>
@@ -331,6 +331,22 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                         <div class="card-body">
                           {% comment %} <p class="card-text"></p> {% endcomment %}
 
+                          <div class="card">
+                            <div class="card-body">
+                              <label class="small" id="class_prof_label{{ imagem_curso.id }}" for="class_prof">Class. Prof.</label>
+                              <select name="class_prof" class="form-select form-select-sm" data-imagem-id="{{ imagem_curso.id }}">
+                                <option value=""></option>
+                                <option value="Normal" {% if imagem_curso.class_prof == "Normal" %}selected{% endif %}>Normal</option>
+                                <option value="Normal Esperado" {% if imagem_curso.class_prof == "Normal Esperado" %}selected{% endif %}>Normal Esperado</option>
+                                <option value="IDA Mono" {% if imagem_curso.class_prof == "IDA Mono" %}selected{% endif %}>Monocromático</option>
+                                <option value="IDA Cópia" {% if imagem_curso.class_prof == "IDA Cópia" %}selected{% endif %}>Cópia</option>
+                                <option value="IDA Cópia Web" {% if imagem_curso.class_prof == "IDA Cópia Web" %}selected{% endif %}>Cópia Web</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          &nbsp;
+                          
                           <div class="d-flex justify-content-end">
                             <div class="btn-group">
                               {% comment %} <button type="button" class="btn btn-sm btn-outline-secondary">Ver</button> {% endcomment %}
@@ -339,19 +355,8 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                             {% comment %} <small class="text-body-secondary"></small> {% endcomment %}
                           </div>
                           &nbsp;
-                          <div class="card">
-                            <div class="card-body">
-                              <label class="small" id="class_prof_label{{ imagem_curso.id }}" for="class_prof">Class. Prof.</label>
-                              <select name="class_prof" class="form-select form-select-sm" data-imagem-id="{{ imagem_curso.id }}">
-                                <option value=""></option>
-                                <option value="IDA Cópia" {% if imagem_curso.class_prof == "IDA Cópia" %}selected{% endif %}>Cópia</option>
-                                <option value="IDA Cópia Web" {% if imagem_curso.class_prof == "IDA Cópia Web" %}selected{% endif %}>Cópia Web</option>
-                                <option value="IDA Mono" {% if imagem_curso.class_prof == "IDA Mono" %}selected{% endif %}>Monocromático</option>
-                                <option value="Normal" {% if imagem_curso.class_prof == "Normal" %}selected{% endif %}>Normal</option>
-                                <option value="Normal Esperado" {% if imagem_curso.class_prof == "Normal Esperado" %}selected{% endif %}>Normal Esperado</option>
-                              </select>
-                            </div>
-                          </div>
+
+
                         </div>
                         
                         
@@ -360,9 +365,70 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                   {% endfor %}
                   </div>
                 </div>
+
+
+                <p>&nbsp;</p> 
+                <p>&nbsp;</p> 
+                
+
+                <!-- Navegação de páginas -->
+                <div class="pagination justify-content-center">
+                  <ul class="pagination">
+                      {% if page_obj.has_previous %}
+                          <li class="page-item">
+                              <a class="page-link" href="?page=1">&laquo; primeira</a>
+                          </li>
+                          <li class="page-item">
+                              <a class="page-link" href="?page={{ page_obj.previous_page_number }}">anterior</a>
+                          </li>
+                      {% else %}
+                          <li class="page-item disabled">
+                              <span class="page-link">&laquo; primeira</span>
+                          </li>
+                          <li class="page-item disabled">
+                              <span class="page-link">anterior</span>
+                          </li>
+                      {% endif %}
+              
+                      <!-- Links para cada página -->
+                      {% for num in page_obj.paginator.page_range %}
+                          {% if num == page_obj.number %}
+                              <li class="page-item active">
+                                  <span class="page-link">{{ num }}</span>
+                              </li>
+                          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                              <li class="page-item">
+                                  <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                              </li>
+                          {% endif %}
+                      {% endfor %}
+              
+                      {% if page_obj.has_next %}
+                          <li class="page-item">
+                              <a class="page-link" href="?page={{ page_obj.next_page_number }}">próxima</a>
+                          </li>
+                          <li class="page-item">
+                              <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">última &raquo;</a>
+                          </li>
+                      {% else %}
+                          <li class="page-item disabled">
+                              <span class="page-link">próxima</span>
+                          </li>
+                          <li class="page-item disabled">
+                              <span class="page-link">última &raquo;</span>
+                          </li>
+                      {% endif %}
+                  </ul>
+              </div>
+              
+              
+
+
                 {% endif %}                  
               </div>
                 </div>
+
+                
 
 {% comment %} FIM LISTAGEM IMAGENS {% endcomment %}              
 

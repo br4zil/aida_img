@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models import F
+from django.core.paginator import Paginator
 
 
 from galeria import unica_cor
@@ -59,12 +60,19 @@ def galeriaList(request, id_curso):
         
     dadosComparaSisProf = obterDadosComparaSisProf(curso[0].id)
     
+    paginator = Paginator(imagens_curso, 20) 
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, 'galeria/index.html', 
                   {"imagens_curso":imagens_curso, 
                    "curso": curso, 
                    "dados_curso": dados_curso, 
-                   "dadosComparaSisProf": dadosComparaSisProf
+                   "dadosComparaSisProf": dadosComparaSisProf,
+                   'page_obj': page_obj
                   })
+
+
 
 
 def obterDadosComparaSisProf(id_curso):
@@ -167,6 +175,7 @@ def galeriaUpload(request):
     # Verifica se o método da requisição é POST
     if request.method == "POST":
         form = ImagensCursoForm(request.POST, request.FILES)
+
         c=Cursos.objects.filter(id=request.session.get('id_curso'))
         # Se o formulário for válido, processa as imagens
         if form.is_valid():
@@ -183,6 +192,7 @@ def galeriaUpload(request):
                 )
                 # Salva a instância
                 imagem_curso.obs_class_sis = request.build_absolute_uri()
+                imagem_curso.class_prof = request.POST.get('class_prof')
                 imagem_curso.save()
                 
             # Redireciona após salvar todas as imagens

@@ -41,12 +41,23 @@
         <p>&nbsp;</p>
         <form method="post" enctype="multipart/form-data" id="form">
             {% csrf_token %}
-            <div class="row">
-                <label for="id_imagem">Imagens:</label>
-                <input type="file" id="id_imagem" name="imagem" multiple required class="form-control">
-            </div>
             <div class="row form-group my-3">
-                <div class="col-12 col-lg-12 text-center">
+                <div class="col-12 col-lg-6 text-center">
+                    <label for="id_imagem">Imagens:</label>
+                    <input type="file" id="id_imagem" name="imagem" multiple required class="form-control">
+
+                    <p>&nbsp;</p>
+                    <label class="small" id="class_prof_label" for="class_prof">Classificação Professor (opcional)</label>
+                    <select name="class_prof" id="class_prof" class="form-select">
+                    <option value=""></option>
+                    <option value="Normal">Normal</option>
+                    <option value="Normal Esperado">Normal Esperado</option>
+                    <option value="IDA Mono">Monocromático</option>
+                    <option value="IDA Cópia">Cópia</option>
+                    <option value="IDA Cópia Web">Cópia Web</option>
+                    </select>
+
+                    <p>&nbsp;</p>
                     <a class="btn btn-secondary" href="/galeria-list/{{ request.session.id_curso }}">Cancelar</a>
                     <input type="submit" value="Enviar" class="btn btn-success">
                     <div class="loading-icon" style="display: none" id="divloadicon"></div>
