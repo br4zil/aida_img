@@ -23,31 +23,36 @@ import requests
 import tempfile
 import os
 
-def download_image_temp(image_url):
-    """
-    Baixa uma imagem a partir de uma URL e armazena-a temporariamente.
+import requests
+import tempfile
+import os
+import time
 
-    :param image_url: URL da imagem.
-    :return: O caminho para o arquivo temporário onde a imagem foi armazenada.
-    """
-    
-    #print("***********************")
-    #print(image_url)
-    # Fazer uma solicitação GET à URL da imagem
-    response = requests.get(image_url, timeout=10)
-    #print("***********************")
-    
-    # Verificar se a resposta é bem-sucedida
-    if response.status_code != 200:
-        raise ValueError(f"Erro ao baixar a imagem: {response.status_code}")
-    #print("***********************")
-    # Criar um arquivo temporário para armazenar a imagem
-    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(image_url)[1]) as temp_file:
-        # Gravar a imagem no arquivo temporário
-        temp_file.write(response.content)
-        
-        # Retornar o caminho para o arquivo temporário
-        return temp_file.name
+def download_image_temp(image_url):
+    attempt = 1
+    delay = 1  # Tempo inicial de espera em segundos
+
+    while attempt <= 10:
+        try:
+            response = requests.get(image_url, timeout=10)
+            if response.status_code != 200:
+                raise ValueError(f"Erro ao baixar a imagem {image_url}. Erro: {response.status_code}")
+
+            # Criar um arquivo temporário para armazenar a imagem
+            with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(image_url)[1]) as temp_file:
+                # Gravar a imagem no arquivo temporário
+                temp_file.write(response.content)
+                # Retornar o caminho para o arquivo temporário
+                return temp_file.name
+
+        except Exception as e:
+            print(f"Erro na tentativa {attempt}: {e}")
+            if attempt == 10:
+                raise e  # Relevanta a exceção se for a última tentativa
+            time.sleep(delay)
+            delay *= 2  # Dobra o tempo de espera
+            attempt += 1
+
 
 # # Exemplo de uso:
 # image_url = "https://bucketaidaimg.s3.amazonaws.com/static/images/imagens_cursosLocal/1/1/12.png"

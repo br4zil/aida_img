@@ -52,6 +52,7 @@ class ImagensCurso(models.Model):
     class_prof = models.CharField(max_length=20, null=True, blank=True, choices=CLASS_CHOICES, default=None, verbose_name=_("Classificação Professor"))
     obs_class_sis = models.CharField(max_length=100, null=True, blank=True, verbose_name=_("Observações Sistema"))
     obs_class_prof = models.CharField(max_length=100, null=True, blank=True, verbose_name=_("Observações Professor"))
+    caracteristicas = models.BinaryField(null=True, blank=True)
 
     def __str__(self):
         return self.nome_arquivo
