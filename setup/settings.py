@@ -239,3 +239,5 @@ MESSAGE_TAGS = {
 #FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5 MB
 
 # DATA_UPLOAD_MAX_MEMORY_SIZE: Tamanho máximo para dados de uma solicitação de upload em memória
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
