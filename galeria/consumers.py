@@ -177,19 +177,19 @@ class ProgressConsumer(AsyncWebsocketConsumer):
 
                 
             # DA Clip
-            if len(ls_descricao_esperada_imagens) > 0:
-                if img.class_sis is None:
-                    print('===================================NORMAL ESPERADO')
-                    print("Resultados para a foto:")
-                    print(img.imagem.url)
-                    #string = traduzir_pt_en("desenho de um cachorro em uma camiseta")
-                    photo_objects = da_clip.get_image_objects(img.imagem.url, ls_descricao_esperada_imagens)
-                    for obj, prob in photo_objects:
-                        print("===mostrar obj e prob")
-                        print(f"{obj}: {prob:.4f}")
-                        if obj in imagens_esperadas_en and prob>=taxa_minimo_descricao_imagem:
-                            img.class_sis = 'Normal Esperado'
-                            await sync_to_async(img.save)()
+            # if len(ls_descricao_esperada_imagens) > 0:
+            #     if img.class_sis is None:
+            #         print('===================================NORMAL ESPERADO')
+            #         print("Resultados para a foto:")
+            #         print(img.imagem.url)
+            #         #string = traduzir_pt_en("desenho de um cachorro em uma camiseta")
+            #         photo_objects = da_clip.get_image_objects(img.imagem.url, ls_descricao_esperada_imagens)
+            #         for obj, prob in photo_objects:
+            #             print("===mostrar obj e prob")
+            #             print(f"{obj}: {prob:.4f}")
+            #             if obj in imagens_esperadas_en and prob>=taxa_minimo_descricao_imagem:
+            #                 img.class_sis = 'Normal Esperado'
+            #                 await sync_to_async(img.save)()
 
         # Atualizar as imagens restantes do curso para class_sis='Normal'
         await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None).update)(class_sis='Normal')

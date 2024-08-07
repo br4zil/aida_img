@@ -25,7 +25,7 @@
           <td>{{ curso.instituicao }}</td>
           <td>
             <a type="button" class="btn btn-warning" href="/cursos-update/{{ curso.id }}">Editar</a>
-            <a type="button" class="btn btn-danger" href="/cursos-delete/{{ curso.id }}">Excluir</a>
+            {% comment %} <a type="button" class="btn btn-danger" href="/cursos-delete/{{ curso.id }}">Excluir</a> {% endcomment %}
             <a type="button" class="btn btn-info" href="/galeria-list/{{ curso.id }}">Imagens</a>
         </td>
         </tr>
