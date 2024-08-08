@@ -44,6 +44,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
         # Atualizar todas as imagens do curso para class_sis=None de forma assíncrona
         
         await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso).update)(class_sis=None)
+        await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso).update)(obs_class_sis=None)
 
         # Carregar dados do curso
         cursos_async = Cursos.objects.filter(id=id_curso)
@@ -63,8 +64,27 @@ class ProgressConsumer(AsyncWebsocketConsumer):
         imagens = await sync_to_async(list)(imagens_async)
         total_de_imagens = imagens_async.count()
         erro=""
+        atualizarImagens=False
+        continuaAnalise=True
+        atualizarImg=False
+
 
         for i, img in enumerate(imagens, start=1):
+            continuaAnalise=True
+            if atualizarImagens:
+                print(">>>>>>>>>>>>>>>>>>>")
+                print(img.id)
+                imagens_async = ImagensCurso.objects.filter(curso_id=id_curso)
+                imagens = await sync_to_async(list)(imagens_async)
+                print(img.id)
+                print(imagens[13].id)
+                print(imagens[13].class_sis)
+                atualizarImagens=False
+                atualizarImg=True
+            if atualizarImg:
+                if i-1 < len(imagens):  # Subtraímos 1 porque enumerate começa a partir de 1
+                    img = imagens[i-1]
+            
             # Atualizar progresso
             await self.update_progress(f"{i} de {total_de_imagens} {erro}", self.channel_name)
 
@@ -98,8 +118,9 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                 if unica_cor_imagem:
                     img.class_sis = 'IDA_mono'
                     await sync_to_async(img.save)()
+                    continuaAnalise=False
             
-            if img.class_sis is None:
+            if img.class_sis is None and continuaAnalise:
                 # Encontrar imagens similares na base de dados local
                 print('===================================DA COPIA')
                 print(img.id)
@@ -113,17 +134,25 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                 ls_similar_imagens = await similar_img_cnn.find_similar_images(img.imagem.url, ls_imagens, porc_minimo_similar)
                 ls_ids_similares = [str(tupla[0]) for tupla in ls_similar_imagens]
                 ids_similares = ','.join(ls_ids_similares)
+                ls_sim = [str(tupla[1]) for tupla in ls_similar_imagens]
+                str_sim = ','.join(ls_sim)
                 if len(ids_similares)>0:
                     ids_similares = str(img.id)+','+ids_similares
                     img.class_sis = "IDA_copia"
-                    img.obs_class_sis = ids_similares
+                    img.obs_class_sis = ids_similares +'; '+str_sim
                     await sync_to_async(img.save)()
+                    continuaAnalise=False
                 # print(ids_similares)
                 for id_similar_imagem, _ in ls_similar_imagens:
                     img_atualizada = await sync_to_async(ImagensCurso.objects.get)(id=id_similar_imagem)
                     img_atualizada.class_sis = "IDA_copia"
-                    img_atualizada.obs_class_sis = ids_similares
+                    img_atualizada.obs_class_sis = ids_similares +'; '+str_sim
+                    print("salvar na copia")
+                    print(id_similar_imagem)
+                    print(img_atualizada.class_sis)
+                    print(img_atualizada.obs_class_sis)
                     await sync_to_async(img_atualizada.save)()
+                    atualizarImagens=True
                     # imagem_atualizar_class_async = ImagensCurso.objects.filter(id=int(id_similar_imagem))
                     # imagens_atualizar_class = await sync_to_async(list)(imagem_atualizar_class_async)
                     # for i in imagens_atualizar_class:
@@ -136,7 +165,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                 
 
             # Se não encontrou similar na base local, buscar na web
-            if img.class_sis is None:
+            if img.class_sis is None and continuaAnalise:
                 print('===================================DA COPIA WEB')
                 rev_img_searcher = ReverseImageSearcher()
                 retries = 0
@@ -152,6 +181,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                             img.class_sis = 'IDA_copia_web'
                             img.obs_class_sis = res_img_search[0].page_url 
                             await sync_to_async(img.save)()
+                            continuaAnalise=False                            
                         break  # Sai do loop se a operação for bem-sucedida
                     except Exception as e:
                         retries += 1    
@@ -165,7 +195,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
 
 
             # Se ainda não classificada, classificar usando o modelo da_class
-            if img.class_sis is None and checkbox_ia=='s':
+            if img.class_sis is None and checkbox_ia=='s' and continuaAnalise:
                 classificacao = da_class.classificar_imagem(img.imagem.url)
                 if classificacao == False:
                     erro="(Erro: Modelo IA não carregado)"
@@ -174,12 +204,14 @@ class ProgressConsumer(AsyncWebsocketConsumer):
                     if classificacao == '3ForaEscopo':
                         img.class_sis = 'IDA_class'
                         await sync_to_async(img.save)()
+                        continuaAnalise=False
 
-                
             # DA Clip
             # if len(ls_descricao_esperada_imagens) > 0:
-            #     if img.class_sis is None:
+            #     if img.class_sis is None and continuaAnalise:
             #         print('===================================NORMAL ESPERADO')
+            #         print(img.id)
+            #         print(img.class_sis)
             #         print("Resultados para a foto:")
             #         print(img.imagem.url)
             #         #string = traduzir_pt_en("desenho de um cachorro em uma camiseta")
@@ -190,6 +222,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
             #             if obj in imagens_esperadas_en and prob>=taxa_minimo_descricao_imagem:
             #                 img.class_sis = 'Normal Esperado'
             #                 await sync_to_async(img.save)()
+            #                 continuaAnalise=False
 
         # Atualizar as imagens restantes do curso para class_sis='Normal'
         await sync_to_async(ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None).update)(class_sis='Normal')
