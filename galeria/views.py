@@ -37,7 +37,7 @@ def galeriaList(request, id_curso):
     request.session['nome_curso']=curso[0].nome
     
     dados_curso = {'total': 0, 
-                   'total_normal': 0, 
+                   'total_nao_atende': 0, 
                    'total_normal_esperado': 0, 
                    'total_ida_copia': 0, 
                    'total_ida_copia_web': 0, 
@@ -48,13 +48,13 @@ def galeriaList(request, id_curso):
                    'total_ida': 0}
     dados_curso['total'] = ImagensCurso.objects.filter(curso_id=id_curso).count()
     if(dados_curso['total']>0):
-        dados_curso['total_normal'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal').count()
+        dados_curso['total_nao_atende'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Não Atende').count()
         dados_curso['total_normal_esperado'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='Normal Esperado').count()        
         dados_curso['total_ida_copia'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA_copia').count()
         dados_curso['total_ida_copia_web'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA_copia_web').count()
         dados_curso['total_ida_class'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA_class').count()
         dados_curso['total_ida_mono'] = ImagensCurso.objects.filter(curso_id=id_curso, class_sis='IDA_mono').count()
-        dados_curso['porc_normal'] = round(dados_curso['total_normal']/dados_curso['total']*100,2)
+        dados_curso['porc_normal_esperado'] = round(dados_curso['total_normal_esperado']/dados_curso['total']*100,2)
         total_ida = dados_curso['total_ida_copia']+dados_curso['total_ida_copia_web']+dados_curso['total_ida_class']+dados_curso['total_ida_mono']
         dados_curso['total_ida'] = total_ida
         dados_curso['porc_ida'] = round(total_ida/dados_curso['total']*100,2)
@@ -78,14 +78,14 @@ def galeriaList(request, id_curso):
 
 def obterDadosComparaSisProf(id_curso):
     dados = {'iguais':0, 
-                           'normal_prof': 0,
+                           'nao_atende_prof': 0,
                            'normal_esperado_prof': 0,
                            'copia_prof': 0,
                            'copia_web_prof': 0,
                            'mono_prof': 0,
                           }
     dados['iguais']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_sis=F('class_prof')).count()
-    dados['normal_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='Normal').count()
+    dados['nao_atende_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='Não Atende').count()
     dados['normal_esperado_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='Normal Esperado').count()
     dados['copia_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='IDA_copia').count()
     dados['copia_web_prof']=ImagensCurso.objects.order_by("class_sis", "obs_class_sis", "id").filter(curso_id=id_curso, class_prof='IDA_copia_web').count()

@@ -34,6 +34,7 @@ class ImagensCurso(models.Model):
     NOME_CLASS = 'IDA_class'
     NOME_NORMAL = 'Normal'
     NOME_NORMAL_ESPERADO = 'Normal Esperado'
+    NOME_NAO_ATENDE = 'Não Atende'
 
     CLASS_CHOICES = [
         (NOME_IGUAL, _('IDA Igual')),
@@ -43,6 +44,7 @@ class ImagensCurso(models.Model):
         (NOME_CLASS, _('IDA Class')),
         (NOME_NORMAL, _('Normal')),
         (NOME_NORMAL_ESPERADO, _('Normal Esperado')),
+        (NOME_NAO_ATENDE, _('Não Atende')),
     ]
 
     nome_arquivo = models.CharField(max_length=255, null=True, blank=True, verbose_name=_("Nome do Arquivo"))

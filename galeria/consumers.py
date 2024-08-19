@@ -36,7 +36,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
         hora_atual = datetime.now().strftime('%H:%M:%S')
         print(f"A hora atual é: {hora_atual}")
 
-        porc_minimo_similar = 90
+        porc_minimo_similar = 91
         taxa_minimo_descricao_imagem = 0.5
         id_curso = self.scope['url_route']['kwargs']['id_curso']
         checkbox_ia = self.scope['url_route']['kwargs']['checkbox_ia']
@@ -60,7 +60,7 @@ class ProgressConsumer(AsyncWebsocketConsumer):
         
 
         # Carregar todas as imagens do curso em lotes
-        imagens_async = ImagensCurso.objects.filter(curso_id=id_curso)
+        imagens_async = ImagensCurso.objects.filter(curso_id=id_curso, class_sis=None)
         imagens = await sync_to_async(list)(imagens_async)
         total_de_imagens = imagens_async.count()
         erro=""

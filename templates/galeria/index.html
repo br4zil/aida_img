@@ -123,12 +123,12 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                               <td class="text-center">{{dados_curso.total}}</td>
                             </tr>
                             <tr>
-                              <th>Normal</th>
-                              <td class="text-center">{{dados_curso.total_normal}} ({{dados_curso.porc_normal}}%)</td>
+                              <th>Normal Esperado</th>
+                              <td class="text-center">{{dados_curso.total_normal_esperado}} ({{dados_curso.porc_normal_esperado}}%)</td>
                             </tr>
                             <tr>
-                              <th>Normal Esperado</th>
-                              <td class="text-center">{{dados_curso.total_normal_esperado}}</td>
+                              <th>Não Atende</th>
+                              <td class="text-center">{{dados_curso.total_nao_atende}}</td>
                             </tr>
                             <tr>
                               <th>IDA</th>
@@ -184,14 +184,14 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                             </thead>
                             <tbody>
                               <tr>
-                                <th>Normal</th>
-                                <td class="text-center">{{dados_curso.total_normal}}</td>
-                                <td class="text-center">{{dadosComparaSisProf.normal_prof}}</td>
-                              </tr>
-                              <tr>
                                 <th>Normal Esperado</th>
                                 <td class="text-center">{{dados_curso.total_normal_esperado}}</td>
                                 <td class="text-center">{{dadosComparaSisProf.normal_esperado_prof}}</td>
+                              </tr>
+                              <tr>
+                                <th>Não Atende</th>
+                                <td class="text-center">{{dados_curso.total_nao_atende}}</td>
+                                <td class="text-center">{{dadosComparaSisProf.nao_atende_prof}}</td>
                               </tr>
                               <tr>
                                 <th>Monocromático</th>
@@ -249,16 +249,20 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                 <div class="card-body">
               <h6></h6>
               <div>
-            
-              {% comment %} <input type="checkbox" id="checkbox_ia">
-              <label for="checkbox_ia">Usar Inteligência Artificial (IA) na Análise</label> {% endcomment %}
-              
+{% comment %} SERVIDOR  {% endcomment %}
+              {% comment %} <input type="checkbox" id="checkbox_ia"> {% endcomment %}
+              {% comment %} <label for="checkbox_ia">Usar Inteligência Artificial (IA) na Análise</label> {% endcomment %}
+{% comment %} SERVIDOR  {% endcomment %}
+
+
             </div>
                
               {% comment %} <a class="btn btn-danger" href="{%url 'galeria-imagem-delete-all' %}">Excluir todas as imagens</a>     {% endcomment %}
-              
+
+{% comment %} SERVIDOR  {% endcomment %}              
               {% comment %} <a id="btn_analisarIDA" href="" class="btn btn-success">Analisar IDA</a> <div class="loading-icon" id="divloadicon" style="display: none"></div> {% endcomment %}
-              
+{% comment %} SERVIDOR  {% endcomment %}
+
               {% comment %} <a id="btn_analisarIDA" href="{%url 'galeria-identificarIDANoWS' %}" class="btn btn-success">Analisar IDA</a>  {% endcomment %}
               
               <div id="progresso-analisarIDA" class="text-success"></div>
@@ -314,8 +318,11 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                           <img src="{{imagem_curso.imagem.url}}" class="img-thumbnail" alt="..." title="{{ imagem_curso.nome_arquivo }}">
                           <div class="row">
                             <div class="col-md-12">
-                          {% if imagem_curso.class_sis == 'Normal' or imagem_curso.class_sis == 'Normal Esperado' %}
+                          {% if imagem_curso.class_sis == 'Normal Esperado' %}
                           <span class="badge rounded-pill bg-success">{{imagem_curso.class_sis}}</span>
+                          {% endif %}
+                          {% if imagem_curso.class_sis == 'Não Atende' %}
+                          <span class="badge rounded-pill bg-warning">{{imagem_curso.class_sis}}</span>
                           {% endif %}
                           {% if imagem_curso.class_sis == None %}
                           <span class="badge rounded-pill bg-secondary">Não analisado</span>
@@ -345,8 +352,8 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                               <label class="small" id="class_prof_label{{ imagem_curso.id }}" for="class_prof">Class. Prof.</label>
                               <select name="class_prof" class="form-select form-select-sm" data-imagem-id="{{ imagem_curso.id }}">
                                 <option value=""></option>
-                                <option value="Normal" {% if imagem_curso.class_prof == "Normal" %}selected{% endif %}>Normal</option>
                                 <option value="Normal Esperado" {% if imagem_curso.class_prof == "Normal Esperado" %}selected{% endif %}>Normal Esperado</option>
+                                <option value="Não Atende" {% if imagem_curso.class_prof == "Não Atende" %}selected{% endif %}>Não Atende</option>                                
                                 <option value="IDA_mono" {% if imagem_curso.class_prof == "IDA_mono" %}selected{% endif %}>Monocromático</option>
                                 <option value="IDA_copia" {% if imagem_curso.class_prof == "IDA_copia" %}selected{% endif %}>Cópia</option>
                                 <option value="IDA_copia_web" {% if imagem_curso.class_prof == "IDA_copia_web" %}selected{% endif %}>Cópia Web</option>
@@ -566,14 +573,14 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 
               <script>
 //graficos                
-                const xValues = ["Normal", "Normal Esperado", "IDA"];
+                const xValues = ["Normal Esperado", "Não Atende", "IDA"];
                 const yValues = [
-                                {{dados_curso.total_normal}}, 
                                 {{dados_curso.total_normal_esperado}}, 
+                                {{dados_curso.total_nao_atende}}, 
                                 {{dados_curso.total_ida_copia}}+{{dados_curso.total_ida_mono}}+{{dados_curso.total_ida_copia_web}}+{{dados_curso.total_ida_class}}];
                 const barColors = [
                 "#008000",
-                "#00008B",
+                "#ffc107",
                 "#FF0000",
                   
                 ];
@@ -597,10 +604,10 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                 </script>   
                 
                 <script>
-                  const xValues2 = ["Normal", "Normal Esperado", "Cópia", "Cópia Web", "Mono", "Classificada (IA)"];
+                  const xValues2 = ["Normal Esperado", "Não Atende", "Cópia", "Cópia Web", "Mono", "Classificada (IA)"];
                   const yValues2 = [
-                                    {{dados_curso.total_normal}}, 
                                     {{dados_curso.total_normal_esperado}}, 
+                                    {{dados_curso.total_nao_atende}}, 
                                     {{dados_curso.total_ida_copia}}, 
                                     {{dados_curso.total_ida_copia_web}}, 
                                     {{dados_curso.total_ida_mono}},
@@ -608,11 +615,11 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                                   ];
                   const barColors2 = [
                   "#008000",
-                  "#00008B",
+                  "#ffc107",
                   "#FF0000",
                   "#8B0000",
                   "#000000",
-                  "#FFA500 ", 
+                  "#626567", 
                   ];
                   
                   new Chart("myChart2", {
@@ -627,7 +634,7 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
                     options: {
                       title: {
                         display: true,
-                        text: "Detalhes IDA"
+                        text: "Detalhes da Análise"
                       }
                     }
                   });
